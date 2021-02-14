@@ -12,7 +12,7 @@ swimmer_arrows(
   cont = NULL,
   arrow_positions = c(0.1, 1),
   angle = 30,
-  length = ggplot2::unit(0.1, "inches"),
+  length = 0.1,
   type = "closed",
   ...
 )
@@ -37,7 +37,7 @@ narrower, pointier arrows). Essentially describes the width of the arrow
 head. Default is 30}
 
 \item{length}{a unit specifying the length of the arrow head (from tip to
-base).Default is 'unit(0.1, "inches")'}
+base in inches (default is 0.1)'}
 
 \item{type}{one of "open" or "closed" indicating whether the arrow head
 should be a closed triangle. Default is 'closed'}

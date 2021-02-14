@@ -390,7 +390,7 @@ swimmer_points_from_lines <- function(df_lines,id='id',start = 'start',end = 'en
 #'   narrower, pointier arrows). Essentially describes the width of the arrow
 #'   head. Default is 30
 #' @param length a unit specifying the length of the arrow head (from tip to
-#'   base).Default is 'unit(0.1, "inches")'
+#'   base in inches (default is 0.1)'
 #' @param type one of "open" or "closed" indicating whether the arrow head
 #'   should be a closed triangle. Default is 'closed'
 #' @param ... additional geom_segment() arguments
@@ -467,7 +467,7 @@ swimmer_points_from_lines <- function(df_lines,id='id',start = 'start',end = 'en
 #'@export
 
 swimmer_arrows <- function(df_arrows,id='id',arrow_start='end',name_col=NULL,cont=NULL,arrow_positions=c(0.1,1),angle=30,
-                           length = ggplot2::unit(0.1, "inches"),type='closed',...){
+                           length = 0.1,type='closed',...){
 
   df_arrows[,name_col] <- factor(df_arrows[,name_col])
 
@@ -491,7 +491,7 @@ swimmer_arrows <- function(df_arrows,id='id',arrow_start='end',name_col=NULL,con
         y = 'start',
         yend = 'end',
         col = name_col
-      ),arrow=ggplot2::arrow(angle = angle, length = ggplot2::unit(0.1, "inches"),
+      ),arrow=ggplot2::arrow(angle = angle, length = ggplot2::unit(length, "inches"),
                     type = type),...)
 
 
