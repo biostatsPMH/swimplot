@@ -8,6 +8,7 @@ swimmer_points(
   df_points,
   id = "id",
   time = "time",
+  adj.y = 0,
   name_shape = NULL,
   name_col = NULL,
   name_size = NULL,
@@ -23,6 +24,8 @@ swimmer_points(
 \item{id}{column name for id, default is 'id'}
 
 \item{time}{column name with the point locations}
+
+\item{adj.y}{amount to adjust the point within the box vertically (default is 0, point is in the centre of each bar)}
 
 \item{name_shape}{a column name to map the point shape}
 
@@ -92,5 +95,5 @@ swim_plot +
 
 }
 \seealso{
-\code{\link{swimmer_plot}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}}
+\code{\link{swimmer_plot}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}} \code{\link{swimmer_text}}
 }

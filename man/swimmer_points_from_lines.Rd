@@ -85,5 +85,5 @@ ggplot2::scale_shape_manual(name='',values=c(17,15),breaks =
 c('Response_start','Response_end'),labels=c('Response Start','Response End'))
 }
 \seealso{
-\code{\link{swimmer_plot}} \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_arrows}}
+\code{\link{swimmer_plot}} \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_arrows}} \code{\link{swimmer_text}}
 }

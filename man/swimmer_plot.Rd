@@ -34,7 +34,7 @@ swimmer_plot(
 
 \item{base_size}{the base size for the plot, default is 11}
 
-\item{...}{additional geom_bar() arguments}
+\item{...}{additional geom_col() arguments}
 }
 \value{
 a swimmer plot with bars
@@ -70,5 +70,5 @@ ggplot2::ylab('Time (Days)')
 
 }
 \seealso{
-\code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}}
+\code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}} \code{\link{swimmer_text}}
 }

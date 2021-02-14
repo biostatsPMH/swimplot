@@ -9,6 +9,7 @@ swimmer_lines(
   id = "id",
   start = "start",
   end = "end",
+  adj.y = 0,
   name_linetype = NULL,
   name_col = NULL,
   name_size = NULL,
@@ -24,6 +25,8 @@ swimmer_lines(
 \item{start}{column name with the line start locations}
 
 \item{end}{column name with the line end locations}
+
+\item{adj.y}{amount to adjust the line within the box vertically (default is 0, line is in the centre of each bar)}
 
 \item{name_linetype}{a column name to map the line type}
 
@@ -65,5 +68,5 @@ ggplot2::ylab('Time (Days)')
 
 }
 \seealso{
-\code{\link{swimmer_plot}} \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}}
+\code{\link{swimmer_plot}} \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}} \code{\link{swimmer_text}}
 }

@@ -15,7 +15,7 @@
 #'   "decreasing", a column name, or the ids in an order.
 #' @param stratify a list of column names to stratify by
 #' @param base_size the base size for the plot, default is 11
-#' @param ... additional geom_bar() arguments
+#' @param ... additional geom_col() arguments
 #' @return a swimmer plot with bars
 #' @seealso \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}} \code{\link{swimmer_text}}
 #' @examples
@@ -110,8 +110,7 @@ swimmer_plot <- function(df,id='id',end='end',name_fill=NULL,name_col=NULL,id_or
 
   plot <-
     ggplot2::ggplot(df) +
-    ggplot2::geom_bar(position = "stack",
-                      stat = "identity",
+    ggplot2::geom_col(position = "stack",
                       ggplot2::aes_string(fill = name_fill,col = name_col, group = start,x = id, y = end),...) + ggplot2::coord_flip() +
     ggplot2::theme_bw(base_size = base_size) +
     ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),panel.grid.major = ggplot2::element_blank())
@@ -135,6 +134,7 @@ swimmer_plot <- function(df,id='id',end='end',name_fill=NULL,name_col=NULL,id_or
 #' @param df_points a data frame
 #' @param id  column name for id, default is 'id'
 #' @param time column name with the point locations
+#' @param adj.y amount to adjust the point within the box vertically (default is 0, point is in the centre of each bar)
 #' @param name_shape a column name to map the point shape
 #' @param name_col a column name to map the point colour
 #' @param name_size a column name to map the point size
@@ -191,7 +191,7 @@ swimmer_plot <- function(df,id='id',end='end',name_fill=NULL,name_col=NULL,id_or
 #'
 #'
 #' @export
-swimmer_points <-function(df_points,id='id',time='time',name_shape=NULL,name_col=NULL,name_size=NULL,name_fill=NULL,name_stroke=NULL,name_alpha=NULL,...)
+swimmer_points <-function(df_points,id='id',time='time',adj.y=0,name_shape=NULL,name_col=NULL,name_size=NULL,name_fill=NULL,name_stroke=NULL,name_alpha=NULL,...)
 {
 
   df_points[,id] <- as.character(df_points[,id])
@@ -207,7 +207,7 @@ swimmer_points <-function(df_points,id='id',time='time',name_shape=NULL,name_col
         size = name_size,
         fill=name_fill,
         stroke=name_stroke,
-        alpha=name_alpha),...)
+        alpha=name_alpha),position = ggplot2::position_nudge(x = adj.y, y = 0),...)
 
   return(plot.pt)
 }
@@ -224,6 +224,7 @@ swimmer_points <-function(df_points,id='id',time='time',name_shape=NULL,name_col
 #' @param id  column name for id, default is 'id'
 #' @param start column name with the line start locations
 #' @param end column name with the line end locations
+#' @param adj.y amount to adjust the line within the box vertically (default is 0, line is in the centre of each bar)
 #' @param name_linetype a column name to map the line type
 #' @param name_col a column name to map the line colour
 #' @param name_size a column name to map the line size
@@ -254,16 +255,17 @@ swimmer_points <-function(df_points,id='id',time='time',name_shape=NULL,name_col
 #'ggplot2::ylab('Time (Days)')
 #'
 #' @export
-swimmer_lines <- function(df_lines,id='id',start='start',end='end',name_linetype=NULL,name_col=NULL,name_size=NULL,
+swimmer_lines <- function(df_lines,id='id',start='start',end='end',adj.y=0,name_linetype=NULL,name_col=NULL,name_size=NULL,
                           name_alpha=NULL,...){
 
   df_lines[,id] <- as.character(df_lines[,id])
+
 
   plot.lines <-
     ggplot2::geom_segment(
       data = df_lines,
       ggplot2::aes_string(
-        x = id,
+        x = id ,
         xend = id,
         y = start,
         yend = end,
@@ -271,7 +273,7 @@ swimmer_lines <- function(df_lines,id='id',start='start',end='end',name_linetype
         col = name_col,
         size = name_size,
         alpha = name_alpha
-      ),...
+      ),position = ggplot2::position_nudge(x = adj.y, y = 0),...
     )
   return(plot.lines)
 
@@ -514,11 +516,12 @@ swimmer_arrows <- function(df_arrows,id='id',arrow_start='end',name_col=NULL,con
 #' @param df_text a data frame
 #' @param id  column name for id, default is 'id'
 #' @param start column name with the text start locations (if there is no start column will default 0 for all text)
-
-
+#' @param label a column with the text to be added to the plot
 #' @param name_col a column name to map the text colour
 #' @param name_size a column name to map the text size
 #' @param name_alpha a column name to map the text transparency
+#' @param name_fontface a column name to map the text fontface ("plain", "bold", "italic", "bold.italic" can all be used)
+#' @param hjust horizontal justification, default is 0
 #' @param ... additional geom_text() arguments
 #' @return a swimmer plot with text on the bars
 #' @seealso  \code{\link{swimmer_plot}} \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}}
@@ -526,7 +529,8 @@ swimmer_arrows <- function(df_arrows,id='id',arrow_start='end',name_col=NULL,con
 #' #Start with a base swimmer plot
 #'
 #' swim_plot <-
-#'  swimmer_plot(df=ClinicalTrial.Arm,id='id',end='End_trt',name_fill='Arm',col="black",id_order='Arm',alpha=0.6)
+#'  swimmer_plot(df=ClinicalTrial.Arm,id='id',end='End_trt',
+#'  name_fill='Arm',col="black",id_order='Arm',alpha=0.6)
 #'
 #'
 #' # Then add text to the plot
