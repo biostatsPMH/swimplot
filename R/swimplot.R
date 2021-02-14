@@ -17,7 +17,7 @@
 #' @param base_size the base size for the plot, default is 11
 #' @param ... additional geom_bar() arguments
 #' @return a swimmer plot with bars
-#' @seealso \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}}
+#' @seealso \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}} \code{\link{swimmer_text}}
 #' @examples
 #'
 
@@ -143,7 +143,7 @@ swimmer_plot <- function(df,id='id',end='end',name_fill=NULL,name_col=NULL,id_or
 #' @param name_alpha a column name to map the point transparency
 #' @param ... additional geom_point() arguments
 #' @return a swimmer plot with points
-#' @seealso \code{\link{swimmer_plot}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}}
+#' @seealso \code{\link{swimmer_plot}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}} \code{\link{swimmer_text}}
 #' @examples
 #'
 #'
@@ -230,7 +230,7 @@ swimmer_points <-function(df_points,id='id',time='time',name_shape=NULL,name_col
 #' @param name_alpha a column name to map the line transparency
 #' @param ... additional geom_segment() arguments
 #' @return a swimmer plot with lines
-#' @seealso  \code{\link{swimmer_plot}} \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}}
+#' @seealso  \code{\link{swimmer_plot}} \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}} \code{\link{swimmer_text}}
 #' @examples
 #'
 #'
@@ -327,7 +327,7 @@ line_df_to_point_df <-function(df_lines,start = 'start',end = 'end',cont = NULL)
 #' @param name_alpha a column name to map the point transparency
 #' @param ...  additional geom_point() arguments
 #' @return a swimmer plot with points matching the lines
-#' @seealso \code{\link{swimmer_plot}} \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_arrows}}
+#' @seealso \code{\link{swimmer_plot}} \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_arrows}} \code{\link{swimmer_text}}
 #' @examples
 #'
 #'
@@ -395,7 +395,7 @@ swimmer_points_from_lines <- function(df_lines,id='id',start = 'start',end = 'en
 #'   should be a closed triangle. Default is 'closed'
 #' @param ... additional geom_segment() arguments
 #' @return a swimmer plot with arrows
-#' @seealso \code{\link{swimmer_plot}} \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}}
+#' @seealso \code{\link{swimmer_plot}} \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}}  \code{\link{swimmer_text}}
 #' @examples
 #'
 #' #Mapping the arrows to the bars
@@ -497,6 +497,82 @@ swimmer_arrows <- function(df_arrows,id='id',arrow_start='end',name_col=NULL,con
 
   return(plot.arrow)
 }
+
+
+
+
+
+
+
+# swimmer_text ------------------------------------------------------------
+
+
+
+#' Adding text to a swimmers plot
+#'
+#' This function allows you to add text to a swimmers plot created with \code{\link{swimmer_plot}}
+#' @param df_text a data frame
+#' @param id  column name for id, default is 'id'
+#' @param start column name with the text start locations (if there is no start column will default 0 for all text)
+
+
+#' @param name_col a column name to map the text colour
+#' @param name_size a column name to map the text size
+#' @param name_alpha a column name to map the text transparency
+#' @param ... additional geom_text() arguments
+#' @return a swimmer plot with text on the bars
+#' @seealso  \code{\link{swimmer_plot}} \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}}
+#' @examples
+#' #Start with a base swimmer plot
+#'
+#' swim_plot <-
+#'  swimmer_plot(df=ClinicalTrial.Arm,id='id',end='End_trt',name_fill='Arm',col="black",id_order='Arm',alpha=0.6)
+#'
+#'
+#' # Then add text to the plot
+#'
+#'
+#'
+#' swim_plot_with_text <- swim_plot +   swimmer_text(df_text =
+#'ClinicalTrial.Stage,label = 'Stage',size=3,
+#'fontface=ifelse(ClinicalTrial.Stage$Stage=="Early Stage","bold","plain"))
+#'
+#'
+#' # Add ggplot layers to improve the plot's aesthetic
+#'
+#' swim_plot_with_text +
+#' ggplot2::scale_fill_manual(name="Treatment",values=c("#e41a1c", "#377eb8","#4daf4a"))+
+#' ggplot2::ylab('Time (Days)')
+#'
+#' @export
+
+swimmer_text <- function(df_text,id='id',start='start',label='label',name_col=NULL,name_size=NULL,
+                         name_alpha=NULL,name_fontface=NULL,hjust =0,...){
+
+
+  if(!start %in% colnames(df_text))  df_text[,start] <- 0
+
+  df_text[,id] <- as.character(df_text[,id])
+
+  plot.lines <-
+    ggplot2::geom_text(
+      data = df_text,
+      ggplot2::aes_string(
+        label=label,
+        x = id,
+        y = start,
+        col = name_col,
+        size = name_size,
+        alpha = name_alpha,
+        fontface =name_fontface
+      ),hjust=hjust,...
+    )
+  return(plot.lines)
+
+
+}
+
+
 
 
 

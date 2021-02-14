@@ -48,3 +48,18 @@
 #'
 #' }
 "ClinicalTrial.Response"
+
+
+
+
+#' Clinical Trial: Stage
+#'
+#' A dataset containing the Stage information from a simulated clinical trial
+#'
+#' @format A data frame with 36 rows and 2 variables:
+#' \describe{
+#'   \item{id}{Patient id}
+#'   \item{Stage}{Patients clinical stage at enrollment of the study (either Early Stage or Late Stage)}
+#'
+#' }
+"ClinicalTrial.Stage"
