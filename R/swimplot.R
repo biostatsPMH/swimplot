@@ -514,11 +514,12 @@ swimmer_arrows <- function(df_arrows,id='id',arrow_start='end',name_col=NULL,con
 #' @param df_text a data frame
 #' @param id  column name for id, default is 'id'
 #' @param start column name with the text start locations (if there is no start column will default 0 for all text)
-
-
+#' @param label a column with the text to be added to the plot
 #' @param name_col a column name to map the text colour
 #' @param name_size a column name to map the text size
 #' @param name_alpha a column name to map the text transparency
+#' @param name_fontface a column name to map the text fontface ("plain", "bold", "italic", "bold.italic" can all be used)
+#' @param hjust horizontal justification, default is 0
 #' @param ... additional geom_text() arguments
 #' @return a swimmer plot with text on the bars
 #' @seealso  \code{\link{swimmer_plot}} \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}}
@@ -526,7 +527,8 @@ swimmer_arrows <- function(df_arrows,id='id',arrow_start='end',name_col=NULL,con
 #' #Start with a base swimmer plot
 #'
 #' swim_plot <-
-#'  swimmer_plot(df=ClinicalTrial.Arm,id='id',end='End_trt',name_fill='Arm',col="black",id_order='Arm',alpha=0.6)
+#'  swimmer_plot(df=ClinicalTrial.Arm,id='id',end='End_trt',
+#'  name_fill='Arm',col="black",id_order='Arm',alpha=0.6)
 #'
 #'
 #' # Then add text to the plot

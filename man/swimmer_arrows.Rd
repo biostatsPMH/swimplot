@@ -117,5 +117,5 @@ c('Response_start','Response_end'),labels=c('Response Start','Response End'))
 
 }
 \seealso{
-\code{\link{swimmer_plot}} \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}}
+\code{\link{swimmer_plot}} \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}}  \code{\link{swimmer_text}}
 }

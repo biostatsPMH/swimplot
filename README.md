@@ -1,6 +1,6 @@
 "# swimplot" 
 
-Changes in 1.2
+Changes in 1.2.0
 
 Fix the arrow function so the length can be specified
 
