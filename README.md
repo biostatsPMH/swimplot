@@ -1,8 +1,11 @@
 "# swimplot" 
 
-To do
+Changes in 1.2
 
-Fix the arrow function
+Fix the arrow function so the length can be specified
+
+
+To do
 
 Add text
 
