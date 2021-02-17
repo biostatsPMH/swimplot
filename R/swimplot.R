@@ -516,12 +516,13 @@ swimmer_arrows <- function(df_arrows,id='id',arrow_start='end',name_col=NULL,con
 #' @param df_text a data frame
 #' @param id  column name for id, default is 'id'
 #' @param start column name with the text start locations (if there is no start column will default 0 for all text)
+#' @param adj.y amount to adjust the text within the box vertically (default is 0, text is in the centre of each bar)
+#' @param adj.x amount to adjust the text within the box horizontally (default is 0, text starts at the origin)
 #' @param label a column with the text to be added to the plot
 #' @param name_col a column name to map the text colour
 #' @param name_size a column name to map the text size
 #' @param name_alpha a column name to map the text transparency
 #' @param name_fontface a column name to map the text fontface ("plain", "bold", "italic", "bold.italic" can all be used)
-#' @param hjust horizontal justification, default is 0
 #' @param ... additional geom_text() arguments
 #' @return a swimmer plot with text on the bars
 #' @seealso  \code{\link{swimmer_plot}} \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}}
@@ -551,7 +552,7 @@ swimmer_arrows <- function(df_arrows,id='id',arrow_start='end',name_col=NULL,con
 #' @export
 
 swimmer_text <- function(df_text,id='id',start='start',label='label',name_col=NULL,name_size=NULL,
-                         name_alpha=NULL,name_fontface=NULL,hjust =0,...){
+                         name_alpha=NULL,name_fontface=NULL,adj.y=0,adj.x=0,...){
 
 
   if(!start %in% colnames(df_text))  df_text[,start] <- 0
@@ -569,7 +570,7 @@ swimmer_text <- function(df_text,id='id',start='start',label='label',name_col=NU
         size = name_size,
         alpha = name_alpha,
         fontface =name_fontface
-      ),hjust=hjust,...
+      ),hjust=0,position = ggplot2::position_nudge(x = adj.y, y = adj.x),...
     )
   return(plot.lines)
 

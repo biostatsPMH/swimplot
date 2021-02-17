@@ -13,7 +13,8 @@ swimmer_text(
   name_size = NULL,
   name_alpha = NULL,
   name_fontface = NULL,
-  hjust = 0,
+  adj.y = 0,
+  adj.x = 0,
   ...
 )
 }
@@ -34,7 +35,9 @@ swimmer_text(
 
 \item{name_fontface}{a column name to map the text fontface ("plain", "bold", "italic", "bold.italic" can all be used)}
 
-\item{hjust}{horizontal justification, default is 0}
+\item{adj.y}{amount to adjust the text within the box vertically (default is 0, text is in the centre of each bar)}
+
+\item{adj.x}{amount to adjust the text within the box horizontally (default is 0, text starts at the origin)}
 
 \item{...}{additional geom_text() arguments}
 }
