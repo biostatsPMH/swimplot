@@ -20,3 +20,4 @@ Suggests:
     rmarkdown,
     testthat
 VignetteBuilder: knitr
+
