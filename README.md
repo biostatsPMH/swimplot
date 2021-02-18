@@ -2,7 +2,7 @@
 
 Changes in 1.2.0
 
-Fix the arrow function so the length can be specified
+Fixed the arrow function so the length can be specified
 
 Added a function to add text to a swimmers plot
 

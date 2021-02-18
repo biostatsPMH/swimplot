@@ -1,0 +1,64 @@
+---
+title: Toxicity
+author: Jessica Weiss
+output:
+  html_document:
+    mathjax:  default
+    fig_caption:  true
+    toc: true
+    section_numbering: true
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Creating swimmers plots with ease}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(swimplot)
+```
+
+```{r, echo = TRUE,fig.align='centre'}
+
+d1 <- data.frame(id=c(1,2,3,4,5),end=c(3.26,15.45,14.84,3.51,7.44))
+
+Nausea <- data.frame(id=c(1,2,2,3,4),tox="Nausea",grade=as.character(c(1,3,2,2,3)),time=c(2,1,8,10,1.5))
+Fever <- data.frame(id=c(4,5,5,3,3),tox="Fever",grade=as.character(c(1,2,2,1,2)), time=c(1.5,3,6,2,6.5))
+Anemia <- data.frame(id=c(4,5,5,3,3),tox="Anemia",grade=as.character(c(1,1,2,1,3)), time=c(1.5,3,5,2,6))
+
+
+###
+swimmer_plot(df=d1,id='id',end='end',col="black",fill='white')+
+  swimmer_points(df_points=Nausea,id='id',time='time',adj.y = 0.3,size=4,name_shape = 'grade',name_col = 'tox',stroke=3)+
+  swimmer_points(df_points=Fever,id='id',time='time',adj.y = 0,size=4,name_shape = 'grade',name_col = 'tox',stroke=3)+
+  swimmer_points(df_points=Anemia,id='id',time='time',adj.y = -0.3,size=4,name_shape = 'grade',name_col = 'tox',stroke=3)+
+  ggplot2::scale_shape_manual(values=c("1","2","3")) + ggplot2::guides(shape=FALSE)+
+  ggplot2::scale_color_brewer(palette = "Dark2")
+
+
+swimmer_plot(df=d1,id='id',end='end',col="black",fill='white')+
+  swimmer_points(df_points=Nausea,id='id',time='time',adj.y = 0.3,size=4,name_col = 'grade',name_shape = 'tox',stroke=3)+
+  swimmer_points(df_points=Fever,id='id',time='time',adj.y = 0,size=4,name_col = 'grade',name_shape = 'tox',stroke=3)+
+  swimmer_points(df_points=Anemia,id='id',time='time',adj.y = -0.3,size=4,name_col = 'grade',name_shape = 'tox',stroke=3)+ 
+  ggplot2::scale_color_manual(name="Grade",values=c("coral2","red3","orangered4"))
+  
+
+textdf1 <- data.frame(id=unique(d1$id),label="Nausea")
+textdf2 <- data.frame(id=unique(d1$id),label="Fever")
+textdf3 <- data.frame(id=unique(d1$id),label="Anemia")
+
+swimmer_plot(df=d1,id='id',end='end',col="black",fill='white')+
+  swimmer_points(df_points=Nausea,id='id',time='time',adj.y = 0.2,size=4,name_col = 'grade',name_shape = 'grade',stroke=3)+
+  swimmer_points(df_points=Fever,id='id',time='time',adj.y = 0,size=4,name_col = 'grade',name_shape = 'grade',stroke=3)+
+  swimmer_points(df_points=Anemia,id='id',time='time',adj.y = -0.2,size=4,name_col = 'grade',name_shape = 'grade',stroke=3)+ 
+  ggplot2::scale_color_manual(name="Grade",values=c("coral2","red3","orangered4")) + ggplot2::labs(shape="Grade")+
+  swimmer_text(df_text = textdf1,label = 'label',adj.x = -2.2,adj.y = 0.2)+
+  swimmer_text(df_text = textdf2,label = 'label',adj.x = -2.2,adj.y = 0)+
+  swimmer_text(df_text = textdf3,label = 'label',adj.x = -2.2,adj.y = -0.2)
+```
+
