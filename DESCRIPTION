@@ -11,7 +11,8 @@ Imports:
     ggplot2,
     data.table,
     magrittr,
-    utils
+    utils,
+    coolbutuseless/ggpattern
 LazyData: true
 RoxygenNote: 7.1.1
 Encoding: UTF-8
@@ -20,3 +21,4 @@ Suggests:
     rmarkdown,
     testthat
 VignetteBuilder: knitr
+Remotes: coolbutuseless/ggpattern

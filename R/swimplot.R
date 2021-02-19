@@ -58,28 +58,28 @@ swimmer_plot <- function(df,id='id',end='end',name_fill=NULL,name_col=NULL,id_or
 
   if (id_order[1] == 'increasing') {
     id_order <-  suppressMessages(unlist(c(df %>%
-                            dplyr::group_by(!!dplyr::sym(id))  %>%
-                            dplyr::summarise(max_time=max(!!dplyr::sym(end)))  %>%
-                            dplyr::arrange(max_time)  %>%
-                            dplyr::select(!!dplyr::sym(id)))))
+                                             dplyr::group_by(!!dplyr::sym(id))  %>%
+                                             dplyr::summarise(max_time=max(!!dplyr::sym(end)))  %>%
+                                             dplyr::arrange(max_time)  %>%
+                                             dplyr::select(!!dplyr::sym(id)))))
   }
 
   if (id_order[1] == 'decreasing') {
     id_order <-  suppressMessages(unlist(c(df %>%
-                            dplyr::group_by(!!dplyr::sym(id))  %>%
-                            dplyr::summarise(max_time=max(!!dplyr::sym(end)))  %>%
-                            dplyr::arrange(dplyr::desc(max_time))  %>%
-                            dplyr::select(!!dplyr::sym(id)))))
+                                             dplyr::group_by(!!dplyr::sym(id))  %>%
+                                             dplyr::summarise(max_time=max(!!dplyr::sym(end)))  %>%
+                                             dplyr::arrange(dplyr::desc(max_time))  %>%
+                                             dplyr::select(!!dplyr::sym(id)))))
   }
 
 
   if (id_order[1] %in% names(df)) {
     id_order <- suppressMessages(unlist(c(df %>%
-                            dplyr::group_by(!!dplyr::sym(id))  %>%
-                            dplyr::mutate(max_time=max(!!dplyr::sym(end))) %>%
-                            dplyr::top_n(-1,!!dplyr::sym(end))%>%
-                            dplyr::arrange( dplyr::desc(!!dplyr::sym(id_order)),max_time) %>%
-                            dplyr::select(!!dplyr::sym(id)))))
+                                            dplyr::group_by(!!dplyr::sym(id))  %>%
+                                            dplyr::mutate(max_time=max(!!dplyr::sym(end))) %>%
+                                            dplyr::top_n(-1,!!dplyr::sym(end))%>%
+                                            dplyr::arrange( dplyr::desc(!!dplyr::sym(id_order)),max_time) %>%
+                                            dplyr::select(!!dplyr::sym(id)))))
   }
 
 
@@ -123,6 +123,106 @@ swimmer_plot <- function(df,id='id',end='end',name_fill=NULL,name_col=NULL,id_or
 
 }
 
+
+
+
+# swim_plot_pattern -------------------------------------------------------
+
+#' Creating the base of a swimmers plot
+#'
+#' This function allows you to create swimmers plots with bars, includes options to
+#' have the bars change colours and create stratified plots
+#' @param df a data frame
+#' @param id  column name for id, default is 'id'
+#' @param end column name with the bar sizes (or bar end positions if bars change colour)
+#' @param name_fill a column name to map the bar fill
+#' @param name_col a column name to map the bar colour
+#' @param name_pattern a column name to map the pattern
+#' @param name_pattern_fill a column name to map the pattern fill
+#' @param id_order order of the bars by id, default is "increasing", can also input
+#'   "decreasing", a column name, or the ids in an order.
+#' @param stratify a list of column names to stratify by
+#' @param base_size the base size for the plot, default is 11
+#' @param ... additional geom_col() arguments
+#' @return a swimmer plot with bars
+#' @seealso \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}} \code{\link{swimmer_text}}
+#' @export
+swim_plot_pattern <- function(df,id='id',end='end',name_fill=NULL,name_col=NULL,name_pattern=NULL,name_pattern_fill=NULL,id_order = 'increasing',stratify=FALSE,base_size=11,...)
+{
+
+
+  df[,id] <- as.character(df[,id])
+
+
+  max_time <- stats::aggregate(df[,end], by = list(df[,id]), max)
+  names(max_time) <- c(id,end)
+
+  if (id_order[1] == 'increasing') {
+    id_order <-  suppressMessages(unlist(c(df %>%
+                                             dplyr::group_by(!!dplyr::sym(id))  %>%
+                                             dplyr::summarise(max_time=max(!!dplyr::sym(end)))  %>%
+                                             dplyr::arrange(max_time)  %>%
+                                             dplyr::select(!!dplyr::sym(id)))))
+  }
+
+  if (id_order[1] == 'decreasing') {
+    id_order <-  suppressMessages(unlist(c(df %>%
+                                             dplyr::group_by(!!dplyr::sym(id))  %>%
+                                             dplyr::summarise(max_time=max(!!dplyr::sym(end)))  %>%
+                                             dplyr::arrange(dplyr::desc(max_time))  %>%
+                                             dplyr::select(!!dplyr::sym(id)))))
+  }
+
+
+  if (id_order[1] %in% names(df)) {
+    id_order <- suppressMessages(unlist(c(df %>%
+                                            dplyr::group_by(!!dplyr::sym(id))  %>%
+                                            dplyr::mutate(max_time=max(!!dplyr::sym(end))) %>%
+                                            dplyr::top_n(-1,!!dplyr::sym(end))%>%
+                                            dplyr::arrange( dplyr::desc(!!dplyr::sym(id_order)),max_time) %>%
+                                            dplyr::select(!!dplyr::sym(id)))))
+  }
+
+
+  start = 'starting_bars_variable'
+  df <- df %>%
+    dplyr::arrange(!!dplyr::sym(id),!!dplyr::sym(end)) %>%
+    dplyr::group_by(!!dplyr::sym(id))%>%
+    dplyr::mutate(temporary_end=!!dplyr::sym(end)-dplyr::lag(!!dplyr::sym(end)))%>%
+    dplyr::mutate(starting_bars_variable= dplyr::lag(!!dplyr::sym(end)))%>%
+    dplyr::mutate(!!dplyr::sym(end):=ifelse(is.na(temporary_end),!!dplyr::sym(end),temporary_end))%>%
+    dplyr::mutate(starting_bars_variable=ifelse(is.na(starting_bars_variable),0,starting_bars_variable))%>%
+    dplyr::select(-temporary_end)
+
+
+
+
+  # if(is.null(name_fill) & is.null(name_col)) {
+  #   df <- max_time
+  #   df[,start] <- 0
+  #
+  # }
+
+  df <- data.frame(df)
+
+  starting_times <- sort(unique(df[,start]),decreasing = TRUE)
+  df[,start] <- factor(df[,start],starting_times)
+  df[, id] <- factor(df[, id], levels = id_order)
+
+  plot <-
+    ggplot2::ggplot(df) +
+    ggpattern::geom_col_pattern(position = "stack",
+                                ggplot2::aes_string(fill = name_fill,col = name_col,pattern=name_pattern,pattern_fill=name_pattern_fill, group = start,x = id, y = end),...) + ggplot2::coord_flip() +
+    ggplot2::theme_bw(base_size = base_size) +
+    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),panel.grid.major = ggplot2::element_blank())
+
+
+  if(stratify[1]!=FALSE) plot <-  plot + ggplot2::facet_wrap(stats::as.formula(paste("~",paste(stratify,collapse = "+"))),scales = "free_y")+
+    ggplot2::theme(strip.background = ggplot2::element_rect(colour="black", fill="white"))
+
+  return(plot)
+
+}
 
 # swimmer_points ------------------------------------------------------------
 
@@ -299,7 +399,7 @@ swimmer_lines <- function(df_lines,id='id',start='start',end='end',adj.y=0,name_
 line_df_to_point_df <-function(df_lines,start = 'start',end = 'end',cont = NULL) {
 
   df_points_lines <- tidyr::gather_(data=df_lines, key_col = "type",
-                             value_col = "x", gather_cols=c(start,end))
+                                    value_col = "x", gather_cols=c(start,end))
 
   if(!is.null(cont)){
     df_points_lines <- df_points_lines[!(!is.na(df_points_lines[,cont]) & df_points_lines$type== end),]
@@ -494,7 +594,7 @@ swimmer_arrows <- function(df_arrows,id='id',arrow_start='end',name_col=NULL,con
         yend = 'end',
         col = name_col
       ),arrow=ggplot2::arrow(angle = angle, length = ggplot2::unit(length, "inches"),
-                    type = type),...)
+                             type = type),...)
 
 
   return(plot.arrow)
