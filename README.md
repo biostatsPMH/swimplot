@@ -11,7 +11,3 @@ Added the argument adj.y to swimmer_lines and swimmer_points
 To do
 
 Add spaces
-
-Gradient bars
-
-Bars with two colours
