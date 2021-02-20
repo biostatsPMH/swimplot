@@ -9,7 +9,7 @@ output:
     section_numbering: true
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{Creating swimmers plots with ease}
+  %\VignetteIndexEntry{Using swimplot to disply toxicity}
 ---
 
 ```{r, include = FALSE}
