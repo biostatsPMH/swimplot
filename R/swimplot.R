@@ -143,9 +143,44 @@ swimmer_plot <- function(df,id='id',end='end',name_fill=NULL,name_col=NULL,id_or
 #'   "decreasing", a column name, or the ids in an order.
 #' @param stratify a list of column names to stratify by
 #' @param base_size the base size for the plot, default is 11
-#' @param ... additional geom_col() arguments
+#' @param ... additional geom_col_pattern arguments
+#'
+#' @details geom_col_pattern arguments include the arguments from geom_col (eg. col, alpha,..) in addition to
+#' \itemize{
+#'  \item{pattern: }{Pattern name string e.g. 'stripe' (default), 'crosshatch', 'point', 'circle', 'none'}
+#'  \item{pattern_colour: }{Colour used for strokes and points. default: 'black'}
+#'  \item{pattern_fill: }{Fill colour. default: 'black'}
+#'  \item{pattern_angle: }{Orientation of the pattern in degrees. default: 45}
+#'  \item{pattern_density: }{Approximate fill fraction of the pattern. Usually in range [0, 1], but can be higher. default: 0.2}
+#'  \item{pattern_spacing: }{Spacing of the pattern as a fraction of the plot size. default: 0.05}
+#'  \item{pattern_xoffset,pattern_yoffset: }{Offset the origin of the pattern. Range [0, 1]. default: 0. Use this to slightly shift the origin of the pattern. For most patterns, the user should limit the offset value to be less than the pattern spacing.}
+#'  \item{pattern_alpha: }{Alpha transparency for pattern. default: 1}
+#'  \item{pattern_linetype: }{Stroke linetype. default: 1}
+#'  \item{pattern_size: }{Stroke line width. default: 1}
+#' }
 #' @return a swimmer plot with bars
 #' @seealso \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}} \code{\link{swimmer_text}}
+#' @examples
+#'
+#'
+#'# install.packages("remotes")
+#'# remotes::install_github("coolbutuseless/ggpattern")
+#'
+#'library(ggpattern)
+#'library(ggplot2)
+#'
+#'df <- data.frame(id=c(1,2,3,4,5,6,6,6),
+#'                 Treatment = c('a','b','a&b','a','a&b','b','a&b','a'),
+#'                 end=c(1,2,3,4,5,2,4,6))
+#'
+#'
+#'swim_plot_pattern(df = df,name_pattern = 'Treatment',name_pattern_fill = 'Treatment',
+#'                  name_fill = 'Treatment',col='black',pattern_density=0.5)+
+#'  scale_pattern_manual(values = c('a'='none','b'='none','a&b'='stripe'))+
+#'  scale_pattern_fill_manual(values = c('a'='lightblue','b'='pink','a&b'='pink'),breaks = c('a','b'))+
+#' scale_fill_manual(values = c('a'='lightblue','b'='pink','a&b'='lightblue'),breaks = c('a','b'))+
+#'  guides(fill = guide_legend(override.aes = list(pattern = 'none' )),pattern=FALSE)
+#'
 #' @export
 swim_plot_pattern <- function(df,id='id',end='end',name_fill=NULL,name_col=NULL,name_pattern=NULL,name_pattern_fill=NULL,id_order = 'increasing',stratify=FALSE,base_size=11,...)
 {

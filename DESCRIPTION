@@ -1,7 +1,7 @@
 Package: swimplot
 Title: Tools for Creating Swimmers Plots using 'ggplot2'
 Description: Used for creating swimmers plots with functions to customize the bars, add points, add lines, and add arrows.
-Version: 1.2.0.1
+Version: 1.3.0
 License: GPL-3
 Author: Jessica Weiss <jessica.weiss@uhnresearch.ca>, Wei Xu<Wei.Xu@uhnresearch.ca>
 Maintainer: Jessica Weiss <jessica.weiss@uhnresearch.ca>
@@ -22,3 +22,6 @@ Suggests:
     testthat
 VignetteBuilder: knitr
 Remotes: coolbutuseless/ggpattern
+
+
+
