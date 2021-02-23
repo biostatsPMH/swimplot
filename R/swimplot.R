@@ -124,6 +124,7 @@ swimmer_plot <- function(df,id='id',end='end',name_fill=NULL,name_col=NULL,id_or
 }
 
 
+
 # swimmer_points ------------------------------------------------------------
 
 
