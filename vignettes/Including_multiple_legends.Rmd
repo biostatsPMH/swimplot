@@ -1,0 +1,137 @@
+---
+title: Toxicity
+author: Jessica Weiss
+output:
+  html_document:
+    mathjax:  default
+    fig_caption:  true
+    toc: true
+    section_numbering: true
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Including multiple legends}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(swimplot)
+library(ggnewscale)
+library(ggplot2)
+```
+
+## Sample data
+
+ A sample dataset displaying three types of toxicity for 5 patients over the course of a study
+```{r, echo = TRUE,fig.align='centre'}
+
+
+full_treatment <- data.frame(id=c(1,1,1,1,1),
+                             treatment=c('Brigatinib','Crizotinib','Crizotinib','Crizotinib','Brigatinib'),
+                             dose=c(750,90,180,120,600), start=c(2,4,6,7,8),end=c(3,6,7,7.5,9))
+         
+
+full_treatment <- data.frame(id=c(1,1,1,1,1,1,1,1),
+                             treatment=c('Brigatinib','Brigatinib','Brigatinib','Brigatinib','Brigatinib',
+                                         'Crizotinib','Crizotinib','Crizotinib'),
+                             dose=c(750,700,650,600,500,90,120,180), start=c(2,3,4,6,7,10,13,15),end=c(3,4,6,7,8,13,15,17))
+
+
+ae <- data.frame(id=c(1,1,1,1),grade=c("1","2","3","4"),time=c(3,4,6,7),
+                 type=c("Fever",'Nausea',"Fever","Fever"))
+
+
+df <- data.frame(id=c(1,2,3,4,5,6),end=c(17,15,12,8,6,4),pre_study_treatment=factor(c('Surgery',
+                                                                            'Radiation+Surgery',
+                                                                            'Surgery',
+                                                                            'Radiation+Surgery',
+                                                                            'Radiation',
+                                                                            'Nothing')))                 
+
+ swimmer_plot(df=df,col="black",name_fill='pre_study_treatment')+ scale_fill_manual(name="Pre study Treatment",values = c('Radiation'='grey30','Radiation+Surgery'='grey60','Surgery'='grey90','Nothing'='white'),
+                                                                                    breaks=c('Radiation',
+                                                                                             'Surgery',
+                                                                                             'Nothing'))+
+ swimmer_lines(df_lines = full_treatment[full_treatment$treatment=="Crizotinib",],name_col = 'dose',size=15)+
+ scale_colour_gradient("Crizotinib",low = "#FEF0D9", high = "#E34A33")+
+ new_scale("colour") +
+ swimmer_lines(df_lines = full_treatment[full_treatment$treatment=="Brigatinib",],name_col = 'dose',size=15)+
+ scale_colour_gradient("Brigatinib",
+                         low = "#DEEBF7", high = "#3182BD") +
+ 
+ guides(fill = guide_legend(order = 1,ncol=3,override.aes = list(shape = NA,col=NA))) +
+   swimmer_points(df=ae,name_shape = "type",size=8)+
+scale_shape_manual(name="AE",values=c("Fever"=19,'Nausea'=15),guide=guide_legend(ncol=2,order=2))+
+   new_scale("shape")+
+ 
+swimmer_points(df=ae,name_shape = "grade",size=4,col="white",stroke=2)+
+scale_shape_manual(name="AE grade",values=c("1"="1","2"='2',"3"='3',"4"='4'),
+                   guide=guide_legend(ncol=4,order=3,override.aes = list(col=1)),
+                   labels=c("1"="Mild","2"='Moderate',"3"='Severe',"4"='Life-threatening'))
+ 
+ 
+ 
+ 
+ # 1 = Mild adverse event 2 = Moderate adverse event 3 = Severe and undesirable adverse event 4 = Life-threatening or disabling adverse event 5=Death 
+ 
+```
+
+
+```{r, echo = TRUE,fig.align='centre'}
+
+
+full_treatment <- data.frame(id=c(1,1,1,1,1),
+                             treatment=c('Brigatinib','Crizotinib','Crizotinib','Crizotinib','Brigatinib'),
+                             dose=c(750,90,180,120,600), start=c(2,4,6,7,8),end=c(3,6,7,7.5,9))
+         
+
+full_treatment <- data.frame(id=c(1,1,1,1,1,1,1,1),
+                             treatment=c('Brigatinib','Brigatinib','Brigatinib','Brigatinib','Brigatinib',
+                                         'Crizotinib','Crizotinib','Crizotinib'),
+                             dose=c(750,700,650,600,500,90,120,180), start=c(2,3,4,6,7,10,13,15),end=c(3,4,6,7,8,13,15,17))
+
+
+ae <- data.frame(id=c(1,1,1,1,1),grade=c("1","2","3","3","4"),time=c(3,4,6,7,8),
+                 type=c("Fever",'Nausea',"Fever","Fever","Fever"))
+
+
+df <- data.frame(id=c(1,2,3,4,5,6),end=c(17,15,12,8,6,4),pre_study_treatment=factor(c('Surgery',
+                                                                            'Radiation+Surgery',
+                                                                            'Surgery',
+                                                                            'Radiation+Surgery',
+                                                                            'Radiation',
+                                                                            'Nothing')))                 
+
+ swimmer_plot(df=df,col="black",name_fill='pre_study_treatment')+ scale_fill_manual(name="Pre study Treatment",values = c('Radiation'='grey30','Radiation+Surgery'='grey60','Surgery'='grey90','Nothing'='white'),
+                                                                                    breaks=c('Radiation',
+                                                                                             'Surgery',
+                                                                                             'Radiation+Surgery',
+                                                                                             'Nothing'))+
+ swimmer_lines(df_lines = full_treatment[full_treatment$treatment=="Crizotinib",],name_col = 'dose',size=15)+
+ scale_colour_gradient("Crizotinib",low = "#FEF0D9", high = "#E34A33")+
+ new_scale("colour") +
+ swimmer_lines(df_lines = full_treatment[full_treatment$treatment=="Brigatinib",],name_col = 'dose',size=15)+
+ scale_colour_gradient("Brigatinib",
+                         low = "#DEEBF7", high = "#3182BD") +
+ 
+ guides(fill = guide_legend(order = 1,ncol=4,override.aes = list(shape = NA,col=NA))) +
+   swimmer_points(df=ae,name_shape = "type",size=8)+
+scale_shape_manual(name="AE",values=c("Fever"=19,'Nausea'=15),guide=guide_legend(ncol=2,order=2))+
+   new_scale("shape")+
+ 
+swimmer_points(df=ae,name_shape = "grade",size=4,col="white",stroke=2)+
+scale_shape_manual(name="AE grade",values=c("1"="1","2"='2',"3"='3',"4"='4'),
+                   guide=guide_legend(ncol=4,order=3,override.aes = list(col=1)),
+                   labels=c("1"="Mild","2"='Moderate',"3"='Severe',"4"='Life-threatening'))
+ 
+ 
+ 
+ 
+ # 1 = Mild adverse event 2 = Moderate adverse event 3 = Severe and undesirable adverse event 4 = Life-threatening or disabling adverse event 5=Death 
+ 
+```
