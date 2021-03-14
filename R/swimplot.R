@@ -46,7 +46,7 @@
 #'
 
 #' @export
-swimmer_plot <- function(df,id='id',end='end',name_fill=NULL,name_col=NULL,increasing=TRUE,id_order = NULL,stratify=FALSE,base_size=11,...)
+swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_col=NULL,increasing=TRUE,id_order = NULL,stratify=FALSE,base_size=11,...)
 {
 
 
@@ -77,11 +77,26 @@ swimmer_plot <- function(df,id='id',end='end',name_fill=NULL,name_col=NULL,incre
 
   }
 
-
-  start = 'starting_bars_variable'
   df <- df[order(df[,id],df[,end]),]
-  df$starting_bars_variable <- ave(df[,end], df[,id], FUN=lag)
-  df$starting_bars_variable[is.na(df$starting_bars_variable)] <- 0
+  ##Filling in any gaps (Adding empty bars at 0 and between sections)
+  if(start %in% names(df)){
+    add_in <- function(id_fix,df,start,end){
+      df_fix <- df[df[,id]==id_fix,]
+      end_blank <- df_fix[,start][c(0,lag(df_fix[,end])[-1]) != df_fix[,start]]
+      start_blank <- c(0,lag(df_fix[,end])[-1])[c(0,lag(df_fix[,end])[-1]) != df_fix[,start]]
+      df_fixed <- data.frame(id_fix,start_blank,end_blank)
+      names(df_fixed) <- c(id,start,end)
+      merge(df_fixed,df_fix,all=T)
+    }
+    df <- do.call(rbind.data.frame,sapply(unique(df[,id]), add_in,df=df,start=start,end=end,simplify = F))
+
+
+  }else {
+    start = 'starting_bars_variable'
+    df$starting_bars_variable <- ave(df[,end], df[,id], FUN=lag)
+    df$starting_bars_variable[is.na(df$starting_bars_variable)] <- 0
+  }
+
   temp_end <- df[,end] - ave(df[,end], df[,id], FUN=lag)
   df[,end][!is.na(temp_end)] <- temp_end[!is.na(temp_end)]
 
