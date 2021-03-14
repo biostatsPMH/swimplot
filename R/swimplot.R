@@ -11,8 +11,8 @@
 #' @param end column name with the bar sizes (or bar end positions if bars change colour)
 #' @param name_fill a column name to map the bar fill
 #' @param name_col a column name to map the bar colour
-#' @param id_order order of the bars by id, default is "increasing", can also input
-#'   "decreasing", a column name, or the ids in an order.
+#' @param id_order order of the bars by id, can input a column name to sort by, or the ids in order.
+#' @param increasing Binary for if the bars are increasing (Default is TRUE)
 #' @param stratify a list of column names to stratify by
 #' @param base_size the base size for the plot, default is 11
 #' @param ... additional geom_col() arguments
@@ -46,61 +46,46 @@
 #'
 
 #' @export
-swimmer_plot <- function(df,id='id',end='end',name_fill=NULL,name_col=NULL,id_order = 'increasing',stratify=FALSE,base_size=11,...)
+swimmer_plot <- function(df,id='id',end='end',name_fill=NULL,name_col=NULL,increasing=TRUE,id_order = NULL,stratify=FALSE,base_size=11,...)
 {
 
 
   df[,id] <- as.character(df[,id])
 
 
-  max_time <- stats::aggregate(df[,end], by = list(df[,id]), max)
-  names(max_time) <- c(id,end)
+  if(is.null(id_order)){
 
-  if (id_order[1] == 'increasing') {
-    id_order <-  suppressMessages(unlist(c(df %>%
-                            dplyr::group_by(!!dplyr::sym(id))  %>%
-                            dplyr::summarise(max_time=max(!!dplyr::sym(end)))  %>%
-                            dplyr::arrange(max_time)  %>%
-                            dplyr::select(!!dplyr::sym(id)))))
+    max_df <- aggregate(df[,end]~df[,id],FUN=max,na.rm=T)
+    names(max_df) <- c(id,'MAX_TIME_FOR_EACH_ID')
+    if(increasing) {id_order <-  max_df[order(max_df$MAX_TIME_FOR_EACH_ID),id]
+
+    }else id_order <-  max_df[order(max_df$MAX_TIME_FOR_EACH_ID,decreasing = T),id]
+
   }
 
-  if (id_order[1] == 'decreasing') {
-    id_order <-  suppressMessages(unlist(c(df %>%
-                            dplyr::group_by(!!dplyr::sym(id))  %>%
-                            dplyr::summarise(max_time=max(!!dplyr::sym(end)))  %>%
-                            dplyr::arrange(dplyr::desc(max_time))  %>%
-                            dplyr::select(!!dplyr::sym(id)))))
-  }
 
 
   if (id_order[1] %in% names(df)) {
-    id_order <- suppressMessages(unlist(c(df %>%
-                            dplyr::group_by(!!dplyr::sym(id))  %>%
-                            dplyr::mutate(max_time=max(!!dplyr::sym(end))) %>%
-                            dplyr::top_n(-1,!!dplyr::sym(end))%>%
-                            dplyr::arrange( dplyr::desc(!!dplyr::sym(id_order)),max_time) %>%
-                            dplyr::select(!!dplyr::sym(id)))))
+    max_df <- aggregate(df[,end]~df[,id],FUN=max,na.rm=T)
+    names(max_df) <- c(id,'MAX_TIME_FOR_EACH_ID')
+    merged_df_with_max <- merge(max_df,df,all=F)
+    starting_df <-  aggregate(df[,end]~df[,id],FUN=min,na.rm=T)
+    names(starting_df) <- c(id,end)
+    starting_information <- merge(starting_df,merged_df_with_max,all=F)
+    if(increasing) {id_order <- starting_information[order(starting_information[,id_order[1]], -rank(starting_information$MAX_TIME_FOR_EACH_ID), decreasing = TRUE),id]
+    }else id_order <- starting_information[order(starting_information[,id_order[1]], rank(starting_information$MAX_TIME_FOR_EACH_ID), decreasing = TRUE),id]
+
   }
 
 
   start = 'starting_bars_variable'
-  df <- df %>%
-    dplyr::arrange(!!dplyr::sym(id),!!dplyr::sym(end)) %>%
-    dplyr::group_by(!!dplyr::sym(id))%>%
-    dplyr::mutate(temporary_end=!!dplyr::sym(end)-dplyr::lag(!!dplyr::sym(end)))%>%
-    dplyr::mutate(starting_bars_variable= dplyr::lag(!!dplyr::sym(end)))%>%
-    dplyr::mutate(!!dplyr::sym(end):=ifelse(is.na(temporary_end),!!dplyr::sym(end),temporary_end))%>%
-    dplyr::mutate(starting_bars_variable=ifelse(is.na(starting_bars_variable),0,starting_bars_variable))%>%
-    dplyr::select(-temporary_end)
+  df <- df[order(df[,id],df[,end]),]
+  df$starting_bars_variable <- ave(df[,end], df[,id], FUN=lag)
+  df$starting_bars_variable[is.na(df$starting_bars_variable)] <- 0
+  temp_end <- df[,end] - ave(df[,end], df[,id], FUN=lag)
+  df[,end][!is.na(temp_end)] <- temp_end[!is.na(temp_end)]
 
 
-
-
-  # if(is.null(name_fill) & is.null(name_col)) {
-  #   df <- max_time
-  #   df[,start] <- 0
-  #
-  # }
 
   df <- data.frame(df)
 
