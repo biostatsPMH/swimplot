@@ -12,6 +12,7 @@
 #' @param start column name with the bar start positions (only required when there are gaps between sections of bars, or bars which do not start at zero), default is 'start'
 #' @param name_fill a column name to map the bar fill
 #' @param name_col a column name to map the bar colour
+#' @param name_alpha a column name to map the bar transparancy
 #' @param id_order order of the bars by id, can input a column name to sort by, or the ids in order.
 #' @param increasing Binary for if the bars are increasing (Default is TRUE)
 #' @param stratify a list of column names to stratify by
@@ -59,7 +60,7 @@
 #'
 
 #' @export
-swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_col=NULL,increasing=TRUE,id_order = NULL,stratify=FALSE,base_size=11,...)
+swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_col=NULL,name_alpha=NULL,increasing=TRUE,id_order = NULL,stratify=FALSE,base_size=11,...)
 {
 
 
@@ -124,7 +125,7 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
   plot <-
     ggplot2::ggplot(df) +
     ggplot2::geom_col(position = "stack",
-                      ggplot2::aes_string(fill = name_fill,col = name_col, group = start,x = id, y = end),...) + ggplot2::coord_flip() +
+                      ggplot2::aes_string(fill = name_fill,col = name_col,alpha=name_alpha, group = start,x = id, y = end),...) + ggplot2::coord_flip() +
     ggplot2::theme_bw(base_size = base_size) +
     ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),panel.grid.major = ggplot2::element_blank())
 
