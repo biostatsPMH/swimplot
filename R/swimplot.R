@@ -45,6 +45,18 @@
 #'ggplot2::scale_fill_manual(name="Treatment",values=c("#e41a1c", "#377eb8","#4daf4a"))+
 #'ggplot2::ylab('Time (Days)')
 #'
+#'#Example when there are gaps between the bars and bars do not start at zero
+#'
+#'#Both a start and end time need to be specified when there are gaps between sections of bars
+#'
+#'Gap_data <- data.frame(patient_ID=c('ID:3','ID:1','ID:1','ID:1','ID:2','ID:2','ID:2','ID:3','ID:3','ID:2'),
+#'                       start=c(10,1,2,7,2,10,14,5,0,22),
+#'                       end=c(20,2,4,10,7,14,22,7,3,26),treatment=c("A","B","C","A","A","C","A","B","C",NA))
+#'
+#'swimmer_plot(df=Gap_data,id='patient_ID',name_fill="treatment",col=1,id_order = c('ID:1','ID:2','ID:3')) + ggplot2::theme_bw()+
+#'  ggplot2::scale_fill_manual(name="Treatment",values=c("A"="#e41a1c", "B"="#377eb8","C"="#4daf4a",na.value=NA),breaks=c("A","B","C"))+
+#'  ggplot2::scale_y_continuous(breaks=c(0:26))
+#'
 
 #' @export
 swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_col=NULL,increasing=TRUE,id_order = NULL,stratify=FALSE,base_size=11,...)
@@ -56,7 +68,7 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
 
   if(is.null(id_order)){
 
-    max_df <- aggregate(df[,end]~df[,id],FUN=max,na.rm=T)
+    max_df <- stats::aggregate(df[,end]~df[,id],FUN=max,na.rm=T)
     names(max_df) <- c(id,'MAX_TIME_FOR_EACH_ID')
     if(increasing) {id_order <-  max_df[order(max_df$MAX_TIME_FOR_EACH_ID),id]
 
@@ -67,10 +79,10 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
 
 
   if (id_order[1] %in% names(df)) {
-    max_df <- aggregate(df[,end]~df[,id],FUN=max,na.rm=T)
+    max_df <- stats::aggregate(df[,end]~df[,id],FUN=max,na.rm=T)
     names(max_df) <- c(id,'MAX_TIME_FOR_EACH_ID')
     merged_df_with_max <- merge(max_df,df,all=F)
-    starting_df <-  aggregate(df[,end]~df[,id],FUN=min,na.rm=T)
+    starting_df <-  stats::aggregate(df[,end]~df[,id],FUN=min,na.rm=T)
     names(starting_df) <- c(id,end)
     starting_information <- merge(starting_df,merged_df_with_max,all=F)
     if(increasing) {id_order <- starting_information[order(starting_information[,id_order[1]], -rank(starting_information$MAX_TIME_FOR_EACH_ID), decreasing = TRUE),id]
@@ -83,8 +95,8 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
   if(start %in% names(df)){
     add_in <- function(id_fix,df,start,end){
       df_fix <- df[df[,id]==id_fix,]
-      end_blank <- df_fix[,start][c(0,lag(df_fix[,end])[-1]) != df_fix[,start]]
-      start_blank <- c(0,lag(df_fix[,end])[-1])[c(0,lag(df_fix[,end])[-1]) != df_fix[,start]]
+      end_blank <- df_fix[,start][c(0,dplyr::lag(df_fix[,end])[-1]) != df_fix[,start]]
+      start_blank <- c(0,dplyr::lag(df_fix[,end])[-1])[c(0,dplyr::lag(df_fix[,end])[-1]) != df_fix[,start]]
       df_fixed <- data.frame(id_fix,start_blank,end_blank)
       names(df_fixed) <- c(id,start,end)
       merge(df_fixed,df_fix,all=T)
@@ -94,11 +106,11 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
 
   }else {
     start = 'starting_bars_variable'
-    df$starting_bars_variable <- ave(df[,end], df[,id], FUN=lag)
+    df$starting_bars_variable <- stats::ave(df[,end], df[,id], FUN=dplyr::lag)
     df$starting_bars_variable[is.na(df$starting_bars_variable)] <- 0
   }
 
-  temp_end <- df[,end] - ave(df[,end], df[,id], FUN=lag)
+  temp_end <- df[,end] - stats::ave(df[,end], df[,id], FUN=dplyr::lag)
   df[,end][!is.na(temp_end)] <- temp_end[!is.na(temp_end)]
 
 
