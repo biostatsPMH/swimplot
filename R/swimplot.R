@@ -8,7 +8,8 @@
 #' have the bars change colours and create stratified plots
 #' @param df a data frame
 #' @param id  column name for id, default is 'id'
-#' @param end column name with the bar sizes (or bar end positions if bars change colour)
+#' @param end column name with the bar lengths (or bar end positions if bars change colour), default is 'end'
+#' @param start column name with the bar start positions (only required when there are gaps between sections of bars, or bars which do not start at zero), default is 'start'
 #' @param name_fill a column name to map the bar fill
 #' @param name_col a column name to map the bar colour
 #' @param id_order order of the bars by id, can input a column name to sort by, or the ids in order.

@@ -8,9 +8,11 @@ swimmer_plot(
   df,
   id = "id",
   end = "end",
+  start = "start",
   name_fill = NULL,
   name_col = NULL,
-  id_order = "increasing",
+  increasing = TRUE,
+  id_order = NULL,
   stratify = FALSE,
   base_size = 11,
   ...
@@ -21,14 +23,17 @@ swimmer_plot(
 
 \item{id}{column name for id, default is 'id'}
 
-\item{end}{column name with the bar sizes (or bar end positions if bars change colour)}
+\item{end}{column name with the bar lengths (or bar end positions if bars change colour), default is 'end'}
+
+\item{start}{column name with the bar start positions (only required when there are gaps between sections of bars, or bars which do not start at zero), default is 'start'}
 
 \item{name_fill}{a column name to map the bar fill}
 
 \item{name_col}{a column name to map the bar colour}
 
-\item{id_order}{order of the bars by id, default is "increasing", can also input
-"decreasing", a column name, or the ids in an order.}
+\item{increasing}{Binary for if the bars are increasing (Default is TRUE)}
+
+\item{id_order}{order of the bars by id, can input a column name to sort by, or the ids in order.}
 
 \item{stratify}{a list of column names to stratify by}
 
