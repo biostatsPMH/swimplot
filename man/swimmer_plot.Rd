@@ -11,6 +11,7 @@ swimmer_plot(
   start = "start",
   name_fill = NULL,
   name_col = NULL,
+  name_alpha = NULL,
   increasing = TRUE,
   id_order = NULL,
   stratify = FALSE,
@@ -30,6 +31,8 @@ swimmer_plot(
 \item{name_fill}{a column name to map the bar fill}
 
 \item{name_col}{a column name to map the bar colour}
+
+\item{name_alpha}{a column name to map the bar transparancy}
 
 \item{increasing}{Binary for if the bars are increasing (Default is TRUE)}
 
@@ -72,6 +75,20 @@ id_order ='increasing',col="black",alpha=0.75,width=.8,base_size = 18,stratify= 
 swim_plot_stratify +
 ggplot2::scale_fill_manual(name="Treatment",values=c("#e41a1c", "#377eb8","#4daf4a"))+
 ggplot2::ylab('Time (Days)')
+
+#Example when there are gaps between the bars and bars do not start at zero
+
+#Both a start and end time need to be specified when there are gaps between sections of bars
+
+Gap_data <- data.frame(patient_ID=c('ID:3','ID:1','ID:1','ID:1','ID:2','ID:2','ID:2','ID:3','ID:3','ID:2'),
+                      start=c(10,1,2,7,2,10,14,5,0,22),
+                      end=c(20,2,4,10,7,14,22,7,3,26),
+                      treatment=c("A","B","C","A","A","C","A","B","C",NA))
+
+swimmer_plot(df=Gap_data,id='patient_ID',name_fill="treatment",col=1,id_order = c('ID:1','ID:2','ID:3')) +
+ggplot2::theme_bw()+ggplot2::scale_fill_manual(name="Treatment",
+values=c("A"="#e41a1c", "B"="#377eb8","C"="#4daf4a",na.value=NA),breaks=c("A","B","C"))+
+ ggplot2::scale_y_continuous(breaks=c(0:26))
 
 }
 \seealso{

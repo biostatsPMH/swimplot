@@ -50,12 +50,15 @@
 #'
 #'#Both a start and end time need to be specified when there are gaps between sections of bars
 #'
-#'Gap_data <- data.frame(patient_ID=c('ID:3','ID:1','ID:1','ID:1','ID:2','ID:2','ID:2','ID:3','ID:3','ID:2'),
+#'Gap_data <- data.frame(patient_ID=c('ID:3','ID:1','ID:1','ID:1','ID:2',
+#'                                    'ID:2','ID:2','ID:3','ID:3','ID:2'),
 #'                       start=c(10,1,2,7,2,10,14,5,0,22),
-#'                       end=c(20,2,4,10,7,14,22,7,3,26),treatment=c("A","B","C","A","A","C","A","B","C",NA))
+#'                       end=c(20,2,4,10,7,14,22,7,3,26),
+#'                       treatment=c("A","B","C","A","A","C","A","B","C",NA))
 #'
-#'swimmer_plot(df=Gap_data,id='patient_ID',name_fill="treatment",col=1,id_order = c('ID:1','ID:2','ID:3')) + ggplot2::theme_bw()+
-#'  ggplot2::scale_fill_manual(name="Treatment",values=c("A"="#e41a1c", "B"="#377eb8","C"="#4daf4a",na.value=NA),breaks=c("A","B","C"))+
+#'swimmer_plot(df=Gap_data,id='patient_ID',name_fill="treatment",col=1,id_order = c('ID:1','ID:2','ID:3')) +
+#' ggplot2::theme_bw()+ggplot2::scale_fill_manual(name="Treatment",
+#' values=c("A"="#e41a1c", "B"="#377eb8","C"="#4daf4a",na.value=NA),breaks=c("A","B","C"))+
 #'  ggplot2::scale_y_continuous(breaks=c(0:26))
 #'
 
