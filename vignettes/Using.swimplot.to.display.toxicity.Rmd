@@ -1,5 +1,5 @@
 ---
-title: Toxicity
+title: Exploring toxicity using swimplot
 author: Jessica Weiss
 output:
   html_document:
@@ -9,7 +9,7 @@ output:
     section_numbering: true
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{Using swimplot to disply toxicity}
+  %\VignetteIndexEntry{Using swimplot to display toxicity}
 ---
 
 ```{r, include = FALSE}
