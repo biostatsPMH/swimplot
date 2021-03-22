@@ -14,9 +14,10 @@
 #' @param name_col a column name to map the bar colour
 #' @param name_alpha a column name to map the bar transparancy
 #' @param id_order order of the bars by id, can input a column name to sort by, or the ids in order.
-#' @param increasing Binary for if the bars are increasing (Default is TRUE)
+#' @param increasing Binary to specifiy bars in increasing order (Default is TRUE)
 #' @param stratify a list of column names to stratify by
 #' @param base_size the base size for the plot, default is 11
+#' @param identifiers Binary to specifiy patient identifiers are included in the y axis
 #' @param ... additional geom_col() arguments
 #' @return a swimmer plot with bars
 #' @seealso \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}} \code{\link{swimmer_text}}
@@ -40,7 +41,7 @@
 #'#Example with Stratification
 #'
 #'swim_plot_stratify <- swimmer_plot(df=ClinicalTrial.Arm,id='id',end='End_trt',name_fill='Arm',
-#'id_order ='increasing',col="black",alpha=0.75,width=.8,base_size = 18,stratify= c('Age','Sex'))
+#'col="black",alpha=0.75,width=.8,base_size = 18,stratify= c('Age','Sex'))
 #'
 #'swim_plot_stratify +
 #'ggplot2::scale_fill_manual(name="Treatment",values=c("#e41a1c", "#377eb8","#4daf4a"))+
@@ -65,7 +66,7 @@
 
 #' @export
 swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_col=NULL,name_alpha=NULL,increasing=TRUE,id_order = NULL,
-                         stratify=FALSE,base_size=11,...)
+                         stratify=FALSE,base_size=11,identifiers=TRUE,...)
 {
 
 
@@ -137,6 +138,11 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
 
   if(stratify[1]!=FALSE) plot <-  plot + ggplot2::facet_wrap(stats::as.formula(paste("~",paste(stratify,collapse = "+"))),scales = "free_y")+
     ggplot2::theme(strip.background = ggplot2::element_rect(colour="black", fill="white"))
+
+
+  if(identifiers==FALSE) plot <-  plot + theme(axis.title.y=element_blank(),
+               axis.text.y=element_blank(),
+               axis.ticks.y=element_blank())
 
   return(plot)
 
