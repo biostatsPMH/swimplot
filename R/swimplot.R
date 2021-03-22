@@ -57,7 +57,7 @@
 #'                       end=c(20,2,4,10,7,14,22,7,3,26),
 #'                       treatment=c("A","B","C","A","A","C","A","B","C",NA))
 #'
-#'swimmer_plot(df=Gap_data,id='patient_ID',name_fill="treatment",col=1,
+#'swimmer_plot(df=Gap_data,id='patient_ID',name_fill="treatment",col=1,identifiers=FALSE,
 #'id_order = c('ID:1','ID:2','ID:3')) +
 #' ggplot2::theme_bw()+ggplot2::scale_fill_manual(name="Treatment",
 #' values=c("A"="#e41a1c", "B"="#377eb8","C"="#4daf4a",na.value=NA),breaks=c("A","B","C"))+
@@ -68,6 +68,19 @@
 swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_col=NULL,name_alpha=NULL,increasing=TRUE,id_order = NULL,
                          stratify=FALSE,base_size=11,identifiers=TRUE,...)
 {
+
+  #Check deprecated id_order = increasing or decreasing
+  if(!is.null(id_order)) {
+    if(id_order %in% c("increasing",'decreasing')){
+      warning("Increasing/decreasing have been deprecated as options for id_order use increasing=TRUE or increasing=FALSE instead",
+              call. = FALSE)
+
+      if(id_order=="increasing") increasing = TRUE
+      if(id_order=="decreasing") increasing = FALSE
+
+      id_order = NULL
+    }
+  }
 
 
   df[,id] <- as.character(df[,id])
@@ -141,13 +154,12 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
 
 
   if(identifiers==FALSE) plot <-  plot + theme(axis.title.y=element_blank(),
-               axis.text.y=element_blank(),
-               axis.ticks.y=element_blank())
+                                               axis.text.y=element_blank(),
+                                               axis.ticks.y=element_blank())
 
   return(plot)
 
 }
-
 
 
 # swimmer_points ------------------------------------------------------------
