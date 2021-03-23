@@ -16,6 +16,7 @@ swimmer_plot(
   id_order = NULL,
   stratify = FALSE,
   base_size = 11,
+  identifiers = TRUE,
   ...
 )
 }
@@ -34,13 +35,15 @@ swimmer_plot(
 
 \item{name_alpha}{a column name to map the bar transparancy}
 
-\item{increasing}{Binary for if the bars are increasing (Default is TRUE)}
+\item{increasing}{Binary to specifiy bars in increasing order (Default is TRUE)}
 
 \item{id_order}{order of the bars by id, can input a column name to sort by, or the ids in order.}
 
 \item{stratify}{a list of column names to stratify by}
 
 \item{base_size}{the base size for the plot, default is 11}
+
+\item{identifiers}{Binary to specifiy patient identifiers are included in the y axis}
 
 \item{...}{additional geom_col() arguments}
 }
@@ -70,7 +73,7 @@ ggplot2::ylab('Time (Days)')
 #Example with Stratification
 
 swim_plot_stratify <- swimmer_plot(df=ClinicalTrial.Arm,id='id',end='End_trt',name_fill='Arm',
-id_order ='increasing',col="black",alpha=0.75,width=.8,base_size = 18,stratify= c('Age','Sex'))
+col="black",alpha=0.75,width=.8,base_size = 18,stratify= c('Age','Sex'))
 
 swim_plot_stratify +
 ggplot2::scale_fill_manual(name="Treatment",values=c("#e41a1c", "#377eb8","#4daf4a"))+
@@ -86,7 +89,7 @@ Gap_data <- data.frame(patient_ID=c('ID:3','ID:1','ID:1','ID:1','ID:2',
                       end=c(20,2,4,10,7,14,22,7,3,26),
                       treatment=c("A","B","C","A","A","C","A","B","C",NA))
 
-swimmer_plot(df=Gap_data,id='patient_ID',name_fill="treatment",col=1,
+swimmer_plot(df=Gap_data,id='patient_ID',name_fill="treatment",col=1,identifiers=FALSE,
 id_order = c('ID:1','ID:2','ID:3')) +
 ggplot2::theme_bw()+ggplot2::scale_fill_manual(name="Treatment",
 values=c("A"="#e41a1c", "B"="#377eb8","C"="#4daf4a",na.value=NA),breaks=c("A","B","C"))+
