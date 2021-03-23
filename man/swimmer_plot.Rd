@@ -33,9 +33,9 @@ swimmer_plot(
 
 \item{name_col}{a column name to map the bar colour}
 
-\item{name_alpha}{a column name to map the bar transparancy}
+\item{name_alpha}{a column name to map the bar transparency}
 
-\item{increasing}{Binary to specifiy bars in increasing order (Default is TRUE)}
+\item{increasing}{Binary to specify bars in increasing order (Default is TRUE)}
 
 \item{id_order}{order of the bars by id, can input a column name to sort by, or the ids in order.}
 
@@ -43,7 +43,7 @@ swimmer_plot(
 
 \item{base_size}{the base size for the plot, default is 11}
 
-\item{identifiers}{Binary to specifiy patient identifiers are included in the y axis}
+\item{identifiers}{Binary to specify patient identifiers are included in the y axis (default is TRUE)}
 
 \item{...}{additional geom_col() arguments}
 }

@@ -12,18 +12,17 @@
 #' @param start column name with the bar start positions (only required when there are gaps between sections of bars, or bars which do not start at zero), default is 'start'
 #' @param name_fill a column name to map the bar fill
 #' @param name_col a column name to map the bar colour
-#' @param name_alpha a column name to map the bar transparancy
+#' @param name_alpha a column name to map the bar transparency
 #' @param id_order order of the bars by id, can input a column name to sort by, or the ids in order.
-#' @param increasing Binary to specifiy bars in increasing order (Default is TRUE)
+#' @param increasing Binary to specify bars in increasing order (Default is TRUE)
 #' @param stratify a list of column names to stratify by
 #' @param base_size the base size for the plot, default is 11
-#' @param identifiers Binary to specifiy patient identifiers are included in the y axis
+#' @param identifiers Binary to specify patient identifiers are included in the y axis (default is TRUE)
 #' @param ... additional geom_col() arguments
 #' @return a swimmer plot with bars
 #' @seealso \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}} \code{\link{swimmer_text}}
 #' @examples
 #'
-
 #'
 #'
 #'
@@ -71,12 +70,12 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
 
   #Check deprecated id_order = increasing or decreasing
   if(!is.null(id_order)) {
-    if(id_order %in% c("increasing",'decreasing')){
+    if(id_order[1] %in% c("increasing",'decreasing')){
       warning("Increasing/decreasing have been deprecated as options for id_order use increasing=TRUE or increasing=FALSE instead",
               call. = FALSE)
 
-      if(id_order=="increasing") increasing = TRUE
-      if(id_order=="decreasing") increasing = FALSE
+      if(id_order[1]=="increasing") increasing = TRUE
+      if(id_order[1]=="decreasing") increasing = FALSE
 
       id_order = NULL
     }
@@ -153,9 +152,9 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
     ggplot2::theme(strip.background = ggplot2::element_rect(colour="black", fill="white"))
 
 
-  if(identifiers==FALSE) plot <-  plot + theme(axis.title.y=element_blank(),
-                                               axis.text.y=element_blank(),
-                                               axis.ticks.y=element_blank())
+  if(identifiers==FALSE) plot <-  plot + ggplot2::theme(axis.title.y=ggplot2::element_blank(),
+                                               axis.text.y=ggplot2::element_blank(),
+                                               axis.ticks.y=ggplot2::element_blank())
 
   return(plot)
 
@@ -407,7 +406,7 @@ line_df_to_point_df <-function(df_lines,start = 'start',end = 'end',cont = NULL)
 swimmer_points_from_lines <- function(df_lines,id='id',start = 'start',end = 'end',cont = NULL,adj.y=0,name_shape='type',name_col=NULL,name_size=NULL,name_fill=NULL,name_stroke=NULL,name_alpha=NULL,...){
 
   df_points <- line_df_to_point_df(df_lines=df_lines,start = start,end = end,cont = cont)
-  plot.lines.points <-  swimmer_points(df_points=df_points,id=id,time='x',name_shape=name_shape,name_col=name_col,name_size=name_size,name_fill=name_fill,name_stroke=name_stroke,name_alpha=name_alpha,adj.y=adj.y...)
+  plot.lines.points <-  swimmer_points(df_points=df_points,id=id,time='x',adj.y=adj.y,name_shape=name_shape,name_col=name_col,name_size=name_size,name_fill=name_fill,name_stroke=name_stroke,name_alpha=name_alpha,...)
   return(plot.lines.points)
 }
 
@@ -422,9 +421,10 @@ swimmer_points_from_lines <- function(df_lines,id='id',start = 'start',end = 'en
 #' @param df_arrows a data frame
 #' @param id  column name for id, default is 'id'
 #' @param arrow_start column name with the arrow locations default is "end"
-#' @param name_col a column name to map the arrow colour
 #' @param cont a column name including an indicator of which ids have an arrow (NA is no arrow); when  NULL will use
 #'all use all of df_arrows
+#' @param adj.y amount to adjust the line within the box vertically (default is 0, line is in the centre of each bar)
+#' @param name_col a column name to map the arrow colour
 #' @param arrow_positions a vector of the distance from the arrow start to end,
 #'   default is c(0.1,1)
 #' @param angle the angle of the arrow head in degrees (smaller numbers produce
@@ -507,7 +507,7 @@ swimmer_points_from_lines <- function(df_lines,id='id',start = 'start',end = 'en
 #'
 #'@export
 
-swimmer_arrows <- function(df_arrows,id='id',arrow_start='end',name_col=NULL,cont=NULL,arrow_positions=c(0.1,1),angle=30,
+swimmer_arrows <- function(df_arrows,id='id',arrow_start='end',cont=NULL,adj.y=0,name_col=NULL,arrow_positions=c(0.1,1),angle=30,
                            length = 0.1,type='closed',...){
 
   df_arrows[,name_col] <- factor(df_arrows[,name_col])
@@ -533,7 +533,7 @@ swimmer_arrows <- function(df_arrows,id='id',arrow_start='end',name_col=NULL,con
         yend = 'end',
         col = name_col
       ),arrow=ggplot2::arrow(angle = angle, length = ggplot2::unit(length, "inches"),
-                    type = type),...)
+                    type = type),position = ggplot2::position_nudge(x = adj.y, y = 0),...)
 
 
   return(plot.arrow)
