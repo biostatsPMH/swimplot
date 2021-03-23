@@ -8,8 +8,9 @@ swimmer_arrows(
   df_arrows,
   id = "id",
   arrow_start = "end",
-  name_col = NULL,
   cont = NULL,
+  adj.y = 0,
+  name_col = NULL,
   arrow_positions = c(0.1, 1),
   angle = 30,
   length = 0.1,
@@ -24,10 +25,12 @@ swimmer_arrows(
 
 \item{arrow_start}{column name with the arrow locations default is "end"}
 
-\item{name_col}{a column name to map the arrow colour}
-
 \item{cont}{a column name including an indicator of which ids have an arrow (NA is no arrow); when  NULL will use
 all use all of df_arrows}
+
+\item{adj.y}{amount to adjust the line within the box vertically (default is 0, line is in the centre of each bar)}
+
+\item{name_col}{a column name to map the arrow colour}
 
 \item{arrow_positions}{a vector of the distance from the arrow start to end,
 default is c(0.1,1)}
