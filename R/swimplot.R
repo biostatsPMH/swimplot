@@ -359,6 +359,7 @@ line_df_to_point_df <-function(df_lines,start = 'start',end = 'end',cont = NULL)
 #' @param start column name where the line starts, default is 'start'
 #' @param end column name where the line ends, default is 'end'
 #' @param cont a column name of which lines continue (NA is does not continue) these will not have a point at the end of the line
+#' @param adj.y amount to adjust the point within the box vertically (default is 0, point is in the centre of each bar)
 #' @param name_shape a column name to map the point shape
 #' @param name_col a column name to map the point colour
 #' @param name_size a column name to map the point size
@@ -403,10 +404,10 @@ line_df_to_point_df <-function(df_lines,start = 'start',end = 'end',cont = NULL)
 #'c('Response_start','Response_end'),labels=c('Response Start','Response End'))
 #' @export
 
-swimmer_points_from_lines <- function(df_lines,id='id',start = 'start',end = 'end',cont = NULL,name_shape='type',name_col=NULL,name_size=NULL,name_fill=NULL,name_stroke=NULL,name_alpha=NULL,...){
+swimmer_points_from_lines <- function(df_lines,id='id',start = 'start',end = 'end',cont = NULL,adj.y=0,name_shape='type',name_col=NULL,name_size=NULL,name_fill=NULL,name_stroke=NULL,name_alpha=NULL,...){
 
   df_points <- line_df_to_point_df(df_lines=df_lines,start = start,end = end,cont = cont)
-  plot.lines.points <-  swimmer_points(df_points=df_points,id=id,time='x',name_shape=name_shape,name_col=name_col,name_size=name_size,name_fill=name_fill,name_stroke=name_stroke,name_alpha=name_alpha,...)
+  plot.lines.points <-  swimmer_points(df_points=df_points,id=id,time='x',name_shape=name_shape,name_col=name_col,name_size=name_size,name_fill=name_fill,name_stroke=name_stroke,name_alpha=name_alpha,adj.y=adj.y...)
   return(plot.lines.points)
 }
 

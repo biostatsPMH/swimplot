@@ -10,6 +10,7 @@ swimmer_points_from_lines(
   start = "start",
   end = "end",
   cont = NULL,
+  adj.y = 0,
   name_shape = "type",
   name_col = NULL,
   name_size = NULL,
@@ -29,6 +30,8 @@ swimmer_points_from_lines(
 \item{end}{column name where the line ends, default is 'end'}
 
 \item{cont}{a column name of which lines continue (NA is does not continue) these will not have a point at the end of the line}
+
+\item{adj.y}{amount to adjust the point within the box vertically (default is 0, point is in the centre of each bar)}
 
 \item{name_shape}{a column name to map the point shape}
 
