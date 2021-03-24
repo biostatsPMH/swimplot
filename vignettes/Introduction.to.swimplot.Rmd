@@ -32,7 +32,7 @@ A swimmer plot is able to tell a full story using horizontal bars to represent e
 
 The "swimmer" package has a variety of functions which add layers to a swimmer plot by implementing ggplot functions. 
 
-This vignette goes through an example to create swimmers plots, and demonstrates converting a dataframe to the required format.
+This vignette goes through examples to create swimmers plots, and demonstrates converting a dataframe to the required format.
 
 # A working example 
 
