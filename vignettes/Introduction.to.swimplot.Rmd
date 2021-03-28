@@ -184,8 +184,8 @@ Response_plot_with_points
 \tiny
 ```{r col1 , echo=T,warnings=FALSE,message=FALSE}
 AE_plot <-  AE_plot +
-  scale_fill_manual(name="Treatment",values=c("Arm A" = "#e41a1c", "Arm B"="#377eb8","Off Treatment"='#4daf4a'))+
-  scale_color_manual(name="Treatment",values=c("Arm A"="#e41a1c", "Arm B" ="#377eb8","Off Treatment"='#4daf4a')) +
+  scale_fill_manual(name="Treatment",values=c("#e41a1c", "#377eb8",'#4daf4a'))+
+  scale_color_manual(name="Treatment",values=c("#e41a1c", "#377eb8",'#4daf4a')) +
   scale_shape_manual(name="Adverse event",values=c(21,24,17),breaks=c('AE','SAE','Death'))
 
 AE_plot
@@ -194,7 +194,7 @@ AE_plot
 \tiny
 ```{r col2 , echo=T,warnings=F,warnings=FALSE,warnings=FALSE,message=FALSE}
 Response_plot_with_points <- Response_plot_with_points +
-  scale_fill_manual(name="Treatment",values=c("Arm A" ="#e41a1c", "Arm B"="#377eb8","Off Treatment"='#4daf4a'))+
+  scale_fill_manual(name="Treatment",values=c("#e41a1c", "#377eb8",'#4daf4a'))+
   scale_color_manual(name="Response",values=c("grey20","grey80"))+
   scale_shape_manual(name='',values=c(17,15),breaks=c('Response_start','Response_end'),
                      labels=c('Response start','Response end'))
@@ -261,7 +261,7 @@ p1 <- arm_plot + swimmer_points(df_points=ClinicalTrial.AE,id='id',time='time',n
   scale_shape_manual(values=c(21,22,23),breaks=c('AE','SAE','Death'))
   
 
-p1 +scale_fill_manual(name="Treatment",values=c("AE"='grey90',"SAE" ="grey40","Death" =1,"Arm A"="#e41a1c", "Arm B" ="#377eb8","Off Treatment"="#4daf4a"))
+p1 +scale_fill_manual(name="Treatment",values=c('grey40',"#e41a1c", "#377eb8",1,'#4daf4a','grey90'))
 ```
 
 
@@ -271,12 +271,12 @@ However, by removing the AE fills from the legend, and adding them to the points
 ```{r Legend with multiple2 , echo=T,warnings=FALSE,messgages=FALSE}
 #First step is to correct the fill legend 
 
-p2 <- p1 + scale_fill_manual(name="Treatment",values=c("AE"='grey90',"SAE" ="grey40","Death" =1,"Arm A"="#e41a1c", "Arm B" ="#377eb8","Off Treatment"="#4daf4a"),breaks = c("Arm A","Arm B","Off Treatment"))
+p2 <- p1 + scale_fill_manual(name="Treatment",values=c('grey40',"#e41a1c", "#377eb8",1,'#4daf4a','grey90'),breaks = c("Arm A","Arm B","Off Treatment"))
 p2
 ##Then use guides to add the colours to the 
 
 #Setting the colours of the filled points to match the AE type 
-p2 + guides(shape = guide_legend(override.aes = list(fill=c('grey90','grey40',1))),fill = guide_legend(override.aes = list(shape = NA))) 
+p2 + guides(shape = guide_legend(override.aes = list(fill=c('grey40','grey90',1))),fill = guide_legend(override.aes = list(shape = NA))) 
 
 ``` 
 
