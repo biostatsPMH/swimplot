@@ -32,7 +32,7 @@ A swimmer plot is able to tell a full story using horizontal bars to represent e
 
 The "swimmer" package has a variety of functions which add layers to a swimmer plot by implementing ggplot functions. 
 
-This vignette goes through an example to create swimmers plots, and demonstrates converting a dataframe to the required format.
+This vignette goes through examples to create swimmers plots, and demonstrates converting a dataframe to the required format.
 
 # A working example 
 
@@ -52,8 +52,8 @@ knitr::kable(head(ClinicalTrial.Response,10))
 - The `swimmer_plot()` function creates the base of the swimmer plot
 - The required arguments are a dataframe,  an id column name, and the column name of where the bars end
 - By default the bars are in increasing order, but any order can be specified
-- A column name for the fill and colour (outline of the bars) can also be included
-- Individual bars can change colour over time
+- A column name for the fill, transparency and colour (outline of the bars) can also be included
+- Individual bars can change colour/transparency over time
 - Other aesthetics can be manipulated using `geom_bar()` arguments (eg. fill,width, alpha)  
 
 
@@ -65,7 +65,7 @@ swimmer_plot(df=ClinicalTrial.Arm,id='id',end='End_trt',fill='lightblue',width=.
 
 ##  Modifying the order and colours of the bars
 
-The `swimmer_plot()` function includes the option to have the bars change colours. Each section of the bars should be in a different row, where each row includes the time that section ends. By default the bars are plotted in increasing order, the order can also be set to "decreasing", by a column in the dataframe (and then increasing order), or any desired order. Here the bars are ordered by the starting treatment, and follow up time. 
+The `swimmer_plot()` function includes the option to have the bars change colours. Each section of the bars should be in a different row, where each row includes the time that section ends. By default the bars are plotted in increasing order, a column name can be used in the argument id_order to have the bars sorted first by a column, or string of IDs can be specified to have the bars in a specific  order. Here the bars are ordered by the starting treatment, and follow up time. 
 \tiny
 
 ```{r, echo = TRUE,fig.align='centre'}
@@ -81,7 +81,7 @@ Plots can be stratified by any variables in the dataframe
 
 ```{r, echo = TRUE,fig.align='centre'}
 swim_plot_stratify <-swimmer_plot(df=ClinicalTrial.Arm,id='id',end='End_trt',name_fill='Arm',
-id_order ='increasing',col="black",alpha=0.75,width=.8,base_size = 14,stratify= c('Age','Sex'))
+col="black",alpha=0.75,width=.8,base_size = 14,stratify= c('Age','Sex'))
 
 swim_plot_stratify
 ```
@@ -91,6 +91,7 @@ swim_plot_stratify
 - Points are added with the `swimmer_points()` function
 - The required arguments are a dataframe,  an id column name, and the column name of the point's location 
 - The shape, size, fill, stroke, and transparency can all be mapped to columns 
+- The argument adj.y can be used to adjust the height position of points withing a bar
 - Other aesthetics can be manipulated using `geom_point()` arguments  
 
 ```{r, echo = TRUE,fig.align='centre'}
@@ -113,6 +114,7 @@ arm_plot + swimmer_points(df_points=
 - Lines are added with the `swimmer_lines()` function
 - The required arguments are a dataframe,  an id column name, and the column names of the line's start and end locations
 - The linetype, colour, size, and transparency can all be mapped to columns 
+- The argument adj.y can be used to adjust the height position of lines withing a bar
 - Other aesthetics can be manipulated using `geom_segment()` arguments   
 
 ```{r, echo = TRUE,fig.align='centre'}
@@ -186,7 +188,7 @@ Response_plot_with_points
 AE_plot <-  AE_plot +
   scale_fill_manual(name="Treatment",values=c("Arm A" = "#e41a1c", "Arm B"="#377eb8","Off Treatment"='#4daf4a'))+
   scale_color_manual(name="Treatment",values=c("Arm A"="#e41a1c", "Arm B" ="#377eb8","Off Treatment"='#4daf4a')) +
-  scale_shape_manual(name="Adverse event",values=c(21,24,17),breaks=c('AE','SAE','Death'))
+  scale_shape_manual(name="Adverse event",values=c(AE=21,SAE=24,Death=17),breaks=c('AE','SAE','Death'))
 
 AE_plot
 ``` 
@@ -228,18 +230,6 @@ Response_plot_with_points
 ``` 
 
 ### axis 
-  \tiny
-  
-Axis and legends can be labeled with the layer `labs()`, and the y axis can be removed when patient identifiers are not required. 
-
-```{r axis, echo=T, message=FALSE, warning=FALSE}
-
-Response_plot_with_points <- Response_plot_with_points + theme(axis.title.y=element_blank(),
-                                                  axis.text.y=element_blank(),
-                                                  axis.ticks.y=element_blank()) +labs(y="Time since enrollment (months)") 
-Response_plot_with_points
-``` 
-
 
 \tiny
 The swimmer plot is a bar plot that has been turned on its side, so to modify the x axis it is actually required to change the y axis. This is also the case for adding axis labels 
@@ -280,7 +270,48 @@ p2 + guides(shape = guide_legend(override.aes = list(fill=c('grey90','grey40',1)
 
 ``` 
 
+# When there gaps between sections in a single bar
 
+
+There may be situations where you want to include gaps between sections of colours in a single bar, or have bars that do not start  at time zero.
+```{r, echo=T,warnings=FALSE,messgages=FALSE}
+
+Gap_data <- data.frame(patient_ID=c('ID:3','ID:1','ID:1','ID:1','ID:2',
+                                    'ID:2','ID:2','ID:3','ID:3'),
+                       start=c(10,1,2,7,2,10,14,5,0),
+                       end=c(20,2,4,10,7,14,22,7,3),
+                       treatment=c("A","B","C","A","A","C","A","B","C"))
+
+knitr::kable(Gap_data)
+
+```
+
+When a start and end are specified any spaces in between are filled in with a section of "NA"
+```{r, echo=T,warnings=FALSE,messgages=FALSE}
+
+swimmer_plot(df=Gap_data,id='patient_ID',name_fill="treatment",col=1,
+id_order = c('ID:1','ID:2','ID:3')) +theme_bw()
+```
+
+Additional "NA" information can be added to the end of a bar when the colour variables is NA
+```{r, echo=T,warnings=FALSE,messgages=FALSE}
+
+Gap_data <- rbind(Gap_data,data.frame(patient_ID='ID:2',start=22,end=26,treatment=NA))
+knitr::kable(Gap_data)
+```
+
+scale_fill_manual can be used to have the NA sections filled in transparently with the argument na.value=NA 
+
+```{r, echo=T,warnings=FALSE,messgages=FALSE}
+swimmer_plot(df=Gap_data,id='patient_ID',name_fill="treatment",col=1,
+id_order = c('ID:1','ID:2','ID:3')) +
+ggplot2::theme_bw()+ggplot2::scale_fill_manual(name="Treatment",
+ values=c("A"="#e41a1c", "B"="#377eb8","C"="#4daf4a",na.value=NA),breaks=c("A","B","C"))+
+  ggplot2::scale_y_continuous(breaks=c(0:26))
+```
+
+
+ 
 
 # Formatting data 
 

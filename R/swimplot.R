@@ -8,19 +8,21 @@
 #' have the bars change colours and create stratified plots
 #' @param df a data frame
 #' @param id  column name for id, default is 'id'
-#' @param end column name with the bar sizes (or bar end positions if bars change colour)
+#' @param end column name with the bar lengths (or bar end positions if bars change colour), default is 'end'
+#' @param start column name with the bar start positions (only required when there are gaps between sections of bars, or bars which do not start at zero), default is 'start'
 #' @param name_fill a column name to map the bar fill
 #' @param name_col a column name to map the bar colour
-#' @param id_order order of the bars by id, default is "increasing", can also input
-#'   "decreasing", a column name, or the ids in an order.
+#' @param name_alpha a column name to map the bar transparency
+#' @param id_order order of the bars by id, can input a column name to sort by, or the ids in order.
+#' @param increasing Binary to specify bars in increasing order (Default is TRUE)
 #' @param stratify a list of column names to stratify by
 #' @param base_size the base size for the plot, default is 11
+#' @param identifiers Binary to specify patient identifiers are included in the y axis (default is TRUE)
 #' @param ... additional geom_col() arguments
 #' @return a swimmer plot with bars
 #' @seealso \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}} \code{\link{swimmer_text}}
 #' @examples
 #'
-
 #'
 #'
 #'
@@ -38,69 +40,99 @@
 #'#Example with Stratification
 #'
 #'swim_plot_stratify <- swimmer_plot(df=ClinicalTrial.Arm,id='id',end='End_trt',name_fill='Arm',
-#'id_order ='increasing',col="black",alpha=0.75,width=.8,base_size = 18,stratify= c('Age','Sex'))
+#'col="black",alpha=0.75,width=.8,base_size = 18,stratify= c('Age','Sex'))
 #'
 #'swim_plot_stratify +
 #'ggplot2::scale_fill_manual(name="Treatment",values=c("#e41a1c", "#377eb8","#4daf4a"))+
 #'ggplot2::ylab('Time (Days)')
 #'
+#'#Example when there are gaps between the bars and bars do not start at zero
+#'
+#'#Both a start and end time need to be specified when there are gaps between sections of bars
+#'
+#'Gap_data <- data.frame(patient_ID=c('ID:3','ID:1','ID:1','ID:1','ID:2',
+#'                                    'ID:2','ID:2','ID:3','ID:3','ID:2'),
+#'                       start=c(10,1,2,7,2,10,14,5,0,22),
+#'                       end=c(20,2,4,10,7,14,22,7,3,26),
+#'                       treatment=c("A","B","C","A","A","C","A","B","C",NA))
+#'
+#'swimmer_plot(df=Gap_data,id='patient_ID',name_fill="treatment",col=1,identifiers=FALSE,
+#'id_order = c('ID:1','ID:2','ID:3')) +
+#' ggplot2::theme_bw()+ggplot2::scale_fill_manual(name="Treatment",
+#' values=c("A"="#e41a1c", "B"="#377eb8","C"="#4daf4a",na.value=NA),breaks=c("A","B","C"))+
+#'  ggplot2::scale_y_continuous(breaks=c(0:26))
+#'
 
 #' @export
-swimmer_plot <- function(df,id='id',end='end',name_fill=NULL,name_col=NULL,id_order = 'increasing',stratify=FALSE,base_size=11,...)
+swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_col=NULL,name_alpha=NULL,increasing=TRUE,id_order = NULL,
+                         stratify=FALSE,base_size=11,identifiers=TRUE,...)
 {
+
+  #Check deprecated id_order = increasing or decreasing
+  if(!is.null(id_order)) {
+    if(id_order[1] %in% c("increasing",'decreasing')){
+      warning("Increasing/decreasing have been deprecated as options for id_order use increasing=TRUE or increasing=FALSE instead",
+              call. = FALSE)
+
+      if(id_order[1]=="increasing") increasing = TRUE
+      if(id_order[1]=="decreasing") increasing = FALSE
+
+      id_order = NULL
+    }
+  }
 
 
   df[,id] <- as.character(df[,id])
 
 
-  max_time <- stats::aggregate(df[,end], by = list(df[,id]), max)
-  names(max_time) <- c(id,end)
+  if(is.null(id_order)){
 
-  if (id_order[1] == 'increasing') {
-    id_order <-  suppressMessages(unlist(c(df %>%
-                            dplyr::group_by(!!dplyr::sym(id))  %>%
-                            dplyr::summarise(max_time=max(!!dplyr::sym(end)))  %>%
-                            dplyr::arrange(max_time)  %>%
-                            dplyr::select(!!dplyr::sym(id)))))
+    max_df <- stats::aggregate(df[,end]~df[,id],FUN=max,na.rm=T)
+    names(max_df) <- c(id,'MAX_TIME_FOR_EACH_ID')
+    if(increasing) {id_order <-  max_df[order(max_df$MAX_TIME_FOR_EACH_ID),id]
+
+    }else id_order <-  max_df[order(max_df$MAX_TIME_FOR_EACH_ID,decreasing = T),id]
+
   }
 
-  if (id_order[1] == 'decreasing') {
-    id_order <-  suppressMessages(unlist(c(df %>%
-                            dplyr::group_by(!!dplyr::sym(id))  %>%
-                            dplyr::summarise(max_time=max(!!dplyr::sym(end)))  %>%
-                            dplyr::arrange(dplyr::desc(max_time))  %>%
-                            dplyr::select(!!dplyr::sym(id)))))
-  }
 
 
   if (id_order[1] %in% names(df)) {
-    id_order <- suppressMessages(unlist(c(df %>%
-                            dplyr::group_by(!!dplyr::sym(id))  %>%
-                            dplyr::mutate(max_time=max(!!dplyr::sym(end))) %>%
-                            dplyr::top_n(-1,!!dplyr::sym(end))%>%
-                            dplyr::arrange( dplyr::desc(!!dplyr::sym(id_order)),max_time) %>%
-                            dplyr::select(!!dplyr::sym(id)))))
+    max_df <- stats::aggregate(df[,end]~df[,id],FUN=max,na.rm=T)
+    names(max_df) <- c(id,'MAX_TIME_FOR_EACH_ID')
+    merged_df_with_max <- merge(max_df,df,all=F)
+    starting_df <-  stats::aggregate(df[,end]~df[,id],FUN=min,na.rm=T)
+    names(starting_df) <- c(id,end)
+    starting_information <- merge(starting_df,merged_df_with_max,all=F)
+    if(increasing) {id_order <- starting_information[order(starting_information[,id_order[1]], -rank(starting_information$MAX_TIME_FOR_EACH_ID), decreasing = TRUE),id]
+    }else id_order <- starting_information[order(starting_information[,id_order[1]], rank(starting_information$MAX_TIME_FOR_EACH_ID), decreasing = TRUE),id]
+
   }
 
+  df <- df[order(df[,id],df[,end]),]
+  ##Filling in any gaps (Adding empty bars at 0 and between sections)
+  if(start %in% names(df)){
+    add_in <- function(id_fix,df,start,end){
+      df_fix <- df[df[,id]==id_fix,]
+      end_blank <- df_fix[,start][c(0,dplyr::lag(df_fix[,end])[-1]) != df_fix[,start]]
+      start_blank <- c(0,dplyr::lag(df_fix[,end])[-1])[c(0,dplyr::lag(df_fix[,end])[-1]) != df_fix[,start]]
+      df_fixed <- data.frame(id_fix,start_blank,end_blank)
+      names(df_fixed) <- c(id,start,end)
+      merge(df_fixed,df_fix,all=T)
+    }
+    df <- do.call(rbind.data.frame,sapply(unique(df[,id]), add_in,df=df,start=start,end=end,simplify = F))
 
-  start = 'starting_bars_variable'
-  df <- df %>%
-    dplyr::arrange(!!dplyr::sym(id),!!dplyr::sym(end)) %>%
-    dplyr::group_by(!!dplyr::sym(id))%>%
-    dplyr::mutate(temporary_end=!!dplyr::sym(end)-dplyr::lag(!!dplyr::sym(end)))%>%
-    dplyr::mutate(starting_bars_variable= dplyr::lag(!!dplyr::sym(end)))%>%
-    dplyr::mutate(!!dplyr::sym(end):=ifelse(is.na(temporary_end),!!dplyr::sym(end),temporary_end))%>%
-    dplyr::mutate(starting_bars_variable=ifelse(is.na(starting_bars_variable),0,starting_bars_variable))%>%
-    dplyr::select(-temporary_end)
+
+  }else {
+    start = 'starting_bars_variable'
+    df$starting_bars_variable <- stats::ave(df[,end], df[,id], FUN=dplyr::lag)
+    df$starting_bars_variable[is.na(df$starting_bars_variable)] <- 0
+  }
+
+  temp_end <- df[,end] - stats::ave(df[,end], df[,id], FUN=dplyr::lag)
+  df[,end][!is.na(temp_end)] <- temp_end[!is.na(temp_end)]
 
 
-
-
-  # if(is.null(name_fill) & is.null(name_col)) {
-  #   df <- max_time
-  #   df[,start] <- 0
-  #
-  # }
 
   df <- data.frame(df)
 
@@ -111,7 +143,7 @@ swimmer_plot <- function(df,id='id',end='end',name_fill=NULL,name_col=NULL,id_or
   plot <-
     ggplot2::ggplot(df) +
     ggplot2::geom_col(position = "stack",
-                      ggplot2::aes_string(fill = name_fill,col = name_col, group = start,x = id, y = end),...) + ggplot2::coord_flip() +
+                      ggplot2::aes_string(fill = name_fill,col = name_col,alpha=name_alpha, group = start,x = id, y = end),...) + ggplot2::coord_flip() +
     ggplot2::theme_bw(base_size = base_size) +
     ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),panel.grid.major = ggplot2::element_blank())
 
@@ -119,10 +151,14 @@ swimmer_plot <- function(df,id='id',end='end',name_fill=NULL,name_col=NULL,id_or
   if(stratify[1]!=FALSE) plot <-  plot + ggplot2::facet_wrap(stats::as.formula(paste("~",paste(stratify,collapse = "+"))),scales = "free_y")+
     ggplot2::theme(strip.background = ggplot2::element_rect(colour="black", fill="white"))
 
+
+  if(identifiers==FALSE) plot <-  plot + ggplot2::theme(axis.title.y=ggplot2::element_blank(),
+                                               axis.text.y=ggplot2::element_blank(),
+                                               axis.ticks.y=ggplot2::element_blank())
+
   return(plot)
 
 }
-
 
 
 # swimmer_points ------------------------------------------------------------
@@ -322,6 +358,7 @@ line_df_to_point_df <-function(df_lines,start = 'start',end = 'end',cont = NULL)
 #' @param start column name where the line starts, default is 'start'
 #' @param end column name where the line ends, default is 'end'
 #' @param cont a column name of which lines continue (NA is does not continue) these will not have a point at the end of the line
+#' @param adj.y amount to adjust the point within the box vertically (default is 0, point is in the centre of each bar)
 #' @param name_shape a column name to map the point shape
 #' @param name_col a column name to map the point colour
 #' @param name_size a column name to map the point size
@@ -366,10 +403,10 @@ line_df_to_point_df <-function(df_lines,start = 'start',end = 'end',cont = NULL)
 #'c('Response_start','Response_end'),labels=c('Response Start','Response End'))
 #' @export
 
-swimmer_points_from_lines <- function(df_lines,id='id',start = 'start',end = 'end',cont = NULL,name_shape='type',name_col=NULL,name_size=NULL,name_fill=NULL,name_stroke=NULL,name_alpha=NULL,...){
+swimmer_points_from_lines <- function(df_lines,id='id',start = 'start',end = 'end',cont = NULL,adj.y=0,name_shape='type',name_col=NULL,name_size=NULL,name_fill=NULL,name_stroke=NULL,name_alpha=NULL,...){
 
   df_points <- line_df_to_point_df(df_lines=df_lines,start = start,end = end,cont = cont)
-  plot.lines.points <-  swimmer_points(df_points=df_points,id=id,time='x',name_shape=name_shape,name_col=name_col,name_size=name_size,name_fill=name_fill,name_stroke=name_stroke,name_alpha=name_alpha,...)
+  plot.lines.points <-  swimmer_points(df_points=df_points,id=id,time='x',adj.y=adj.y,name_shape=name_shape,name_col=name_col,name_size=name_size,name_fill=name_fill,name_stroke=name_stroke,name_alpha=name_alpha,...)
   return(plot.lines.points)
 }
 
@@ -384,9 +421,10 @@ swimmer_points_from_lines <- function(df_lines,id='id',start = 'start',end = 'en
 #' @param df_arrows a data frame
 #' @param id  column name for id, default is 'id'
 #' @param arrow_start column name with the arrow locations default is "end"
-#' @param name_col a column name to map the arrow colour
 #' @param cont a column name including an indicator of which ids have an arrow (NA is no arrow); when  NULL will use
 #'all use all of df_arrows
+#' @param adj.y amount to adjust the line within the box vertically (default is 0, line is in the centre of each bar)
+#' @param name_col a column name to map the arrow colour
 #' @param arrow_positions a vector of the distance from the arrow start to end,
 #'   default is c(0.1,1)
 #' @param angle the angle of the arrow head in degrees (smaller numbers produce
@@ -469,7 +507,7 @@ swimmer_points_from_lines <- function(df_lines,id='id',start = 'start',end = 'en
 #'
 #'@export
 
-swimmer_arrows <- function(df_arrows,id='id',arrow_start='end',name_col=NULL,cont=NULL,arrow_positions=c(0.1,1),angle=30,
+swimmer_arrows <- function(df_arrows,id='id',arrow_start='end',cont=NULL,adj.y=0,name_col=NULL,arrow_positions=c(0.1,1),angle=30,
                            length = 0.1,type='closed',...){
 
   df_arrows[,name_col] <- factor(df_arrows[,name_col])
@@ -495,7 +533,7 @@ swimmer_arrows <- function(df_arrows,id='id',arrow_start='end',name_col=NULL,con
         yend = 'end',
         col = name_col
       ),arrow=ggplot2::arrow(angle = angle, length = ggplot2::unit(length, "inches"),
-                    type = type),...)
+                    type = type),position = ggplot2::position_nudge(x = adj.y, y = 0),...)
 
 
   return(plot.arrow)
