@@ -9,6 +9,7 @@ Imports:
     tidyr,
     dplyr,
     ggplot2,
+    ggpattern
 LazyData: true
 RoxygenNote: 7.1.1
 Encoding: UTF-8
@@ -17,5 +18,5 @@ Suggests:
     rmarkdown,
     testthat
 VignetteBuilder: knitr
-
+Remotes: coolbutuseless/ggpattern
 
