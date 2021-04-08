@@ -112,6 +112,28 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
   df <- df[order(df[,id],df[,end]),]
   ##Filling in any gaps (Adding empty bars at 0 and between sections)
   if(start %in% names(df)){
+
+    ##Removing rows that start before 0
+    negative_start <- df[,id][df[,start]<0]
+    if(length(negative_start)>0) {stop(paste0(    paste0("There is(are) ", length(negative_start)," id(s) that have negative start times ",id ,"=(",paste (negative_start,sep="", collapse=","),")")))}
+
+
+    ##Checking there are not overlapping sections
+    check_for_overlap <- function(data,id,start,end,x){
+      single <- data[data[,id]==x,]
+      if(dim(single)[1]>1){
+        single <- single[order(single[,start]),]
+        check_val <- min(single[,start]-dplyr::lag(single[,end]),na.rm = T)
+        if(check_val<0) return(x)
+      }
+    }
+
+
+    overlap <- unlist(sapply(unique(df[,id]), check_for_overlap,start=start,end=end,data=df,id=id))
+
+
+    if(length(overlap)>0) {stop(paste0(    paste0("There is(are) ", length(overlap)," id(s) with overlap between bars, they are ",id ,"=(",paste (overlap,sep="", collapse=","),")")))}
+
     add_in <- function(id_fix,df,start,end){
       df_fix <- df[df[,id]==id_fix,]
       end_blank <- df_fix[,start][c(0,dplyr::lag(df_fix[,end])[-1]) != df_fix[,start]]
@@ -153,8 +175,8 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
 
 
   if(identifiers==FALSE) plot <-  plot + ggplot2::theme(axis.title.y=ggplot2::element_blank(),
-                                               axis.text.y=ggplot2::element_blank(),
-                                               axis.ticks.y=ggplot2::element_blank())
+                                                        axis.text.y=ggplot2::element_blank(),
+                                                        axis.ticks.y=ggplot2::element_blank())
 
   return(plot)
 
