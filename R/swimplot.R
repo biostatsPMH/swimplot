@@ -137,10 +137,11 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
     add_in <- function(id_fix,df,start,end){
       df_fix <- df[df[,id]==id_fix,]
       end_blank <- df_fix[,start][c(0,dplyr::lag(df_fix[,end])[-1]) != df_fix[,start]]
+      if(length(end_blank)==0) return(df_fix)
       start_blank <- c(0,dplyr::lag(df_fix[,end])[-1])[c(0,dplyr::lag(df_fix[,end])[-1]) != df_fix[,start]]
       df_fixed <- data.frame(id_fix,start_blank,end_blank)
       names(df_fixed) <- c(id,start,end)
-      merge(df_fixed,df_fix,all=T)
+      return(merge(df_fixed,df_fix,all=T))
     }
     df <- do.call(rbind.data.frame,sapply(unique(df[,id]), add_in,df=df,start=start,end=end,simplify = F))
 
