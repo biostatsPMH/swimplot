@@ -64,7 +64,8 @@
 #'
 
 #' @export
-swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_col=NULL,name_alpha=NULL,increasing=TRUE,id_order = NULL,
+swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_col=NULL,name_alpha=NULL,
+                         increasing=TRUE,id_order = NULL,
                          stratify=FALSE,base_size=11,identifiers=TRUE,...)
 {
 
@@ -110,13 +111,8 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
   }
 
   df <- df[order(df[,id],df[,end]),]
-  ##Filling in any gaps (Adding empty bars at 0 and between sections)
+  #Filling in any gaps (Adding empty bars at 0 and between sections)
   if(start %in% names(df)){
-
-    ##Removing rows that start before 0
-    negative_start <- df[,id][df[,start]<0]
-    if(length(negative_start)>0) {stop(paste0(    paste0("There is(are) ", length(negative_start)," id(s) that have negative start times ",id ,"=(",paste (negative_start,sep="", collapse=","),")")))}
-
 
     ##Checking there are not overlapping sections
     check_for_overlap <- function(data,id,start,end,x){
@@ -136,9 +132,17 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
 
     add_in <- function(id_fix,df,start,end){
       df_fix <- df[df[,id]==id_fix,]
-      end_blank <- df_fix[,start][c(0,dplyr::lag(df_fix[,end])[-1]) != df_fix[,start]]
+
+      #Starting bar at 0
+      start_time_pat <- 0
+
+      #If the bar starts before 0 that is okay too
+      if(min(df_fix[,start])<0) start_time_pat <- min(df_fix[,start])
+
+      #Looking for gaps between the bars
+      end_blank <- df_fix[,start][c(start_time_pat,dplyr::lag(df_fix[,end])[-1]) != df_fix[,start]]
       if(length(end_blank)==0) return(df_fix)
-      start_blank <- c(0,dplyr::lag(df_fix[,end])[-1])[c(0,dplyr::lag(df_fix[,end])[-1]) != df_fix[,start]]
+      start_blank <- c(start_time_pat,dplyr::lag(df_fix[,end])[-1])[c(start_time_pat,dplyr::lag(df_fix[,end])[-1]) != df_fix[,start]]
       df_fixed <- data.frame(id_fix,start_blank,end_blank)
       names(df_fixed) <- c(id,start,end)
       return(merge(df_fixed,df_fix,all=T))
@@ -152,14 +156,24 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
     df$starting_bars_variable[is.na(df$starting_bars_variable)] <- 0
   }
 
-  temp_end <- df[,end] - stats::ave(df[,end], df[,id], FUN=dplyr::lag)
-  df[,end][!is.na(temp_end)] <- temp_end[!is.na(temp_end)]
+  #Calculating the length of the bar for that section
+  temp_end <- df$end - as.numeric(as.character(df$start))
 
+  #Sections that are negative have to have a negative length
+  temp_end[as.numeric(as.character(df$start))<0] <- 0 - temp_end[as.numeric(as.character(df$start))<0]
+
+  #This column is the length of the bar section. The end column name is used so the x axis has the correct label
+  df[,end] <- temp_end
 
 
   df <- data.frame(df)
 
   starting_times <- sort(unique(df[,start]),decreasing = TRUE)
+
+  ##Negative times need to be in backwards order to stack properly
+  starting_times[starting_times<0] <- rev(starting_times[starting_times<0])
+
+
   df[,start] <- factor(df[,start],starting_times)
   df[, id] <- factor(df[, id], levels = id_order)
 
@@ -182,8 +196,6 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
   return(plot)
 
 }
-
-
 # swimmer_points ------------------------------------------------------------
 
 
