@@ -313,6 +313,11 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
   #Sections that are negative have to have a negative length
   temp_end[as.numeric(as.character(df[,start]))<0] <- 0 - temp_end[as.numeric(as.character(df[,start]))<0]
 
+
+
+  #Sections that are negative have to have a negative length
+  temp_end[as.numeric(as.character(df$start))<0] <- 0 - temp_end[as.numeric(as.character(df$start))<0]
+
   #This column is the length of the bar section. The end column name is used so the x axis has the correct label
   df[,end] <- temp_end
 
@@ -347,6 +352,7 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
   return(plot)
 
 }
+
 {
 
   #Check deprecated id_order = increasing or decreasing
@@ -476,6 +482,8 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
   return(plot)
 
 }
+
+
 # swimmer_points ------------------------------------------------------------
 
 
