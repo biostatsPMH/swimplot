@@ -51,6 +51,7 @@ knitr::kable(head(ClinicalTrial.Response,10))
 ##  Basic plot
 - The `swimmer_plot()` function creates the base of the swimmer plot
 - The required arguments are a dataframe,  an id column name, and the column name of where the bars end
+- You have the option to add the start time for each bar if there are gaps between sections of bars, or if some bars begin prior to time zero 
 - By default the bars are in increasing order, but any order can be specified
 - A column name for the fill, transparency and colour (outline of the bars) can also be included
 - Individual bars can change colour/transparency over time
@@ -270,7 +271,7 @@ p2 + guides(shape = guide_legend(override.aes = list(fill=c('grey90','grey40',1)
 
 ``` 
 
-# When there gaps between sections in a single bar
+# When there are gaps between sections in a single bar
 
 
 There may be situations where you want to include gaps between sections of colours in a single bar, or have bars that do not start  at time zero.

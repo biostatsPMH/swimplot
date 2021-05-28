@@ -62,7 +62,20 @@
 #' values=c("A"="#e41a1c", "B"="#377eb8","C"="#4daf4a",na.value=NA),breaks=c("A","B","C"))+
 #'  ggplot2::scale_y_continuous(breaks=c(0:26))
 #'
-
+#'
+#' #Example when some of the bars have negative starting positions
+#'
+#'negative_data <- data.frame(id=c(1,1,1,2,3,3,4,5,5,6,7,8,9,9,9),
+#'start=c(-5,-3,-1,-5,-6,-3,-3,-5,3,0,0,0,2,5,10),
+#'end=c(-3,-1,0,-2,-4,-1,3,-3,6,5,6,7,5,8,12),
+#'Dose=c(10,30,10,20,20,20,30,5,5,12,18,22,30,20,10))
+#'swimmer_plot(negative_data,name_fill = 'Dose',col='black',alpha=0.9)+
+#'  ggplot2::theme_bw()+
+#'  ggplot2::geom_hline(yintercept = 0,lwd=2,col='red') +
+#'  ggplot2::scale_fill_gradient(low = "grey90", high = "grey10", na.value = NA)+
+#'  ggplot2::scale_y_continuous(breaks=c(-6:15))
+#'
+#'
 #' @export
 swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_col=NULL,name_alpha=NULL,
                          increasing=TRUE,id_order = NULL,
@@ -85,13 +98,25 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
 
   df[,id] <- as.character(df[,id])
 
-
+  ##Putting in order by increasing or decreasing if a column name/ id order is not given
   if(is.null(id_order)){
     max_df <- stats::aggregate(df[,end]~df[,id],FUN=max,na.rm=T)
     names(max_df) <- c(id,'MAX_TIME_FOR_EACH_ID')
+
     if(increasing) {
       id_order <-  max_df[order(max_df$MAX_TIME_FOR_EACH_ID),id]
     }else id_order <-  max_df[order(max_df$MAX_TIME_FOR_EACH_ID,decreasing = T),id]
+
+    #Will also sort by the start times
+    if(start %in% names(df)) {
+      min_df <- stats::aggregate(df[,start]~df[,id],FUN=min,na.rm=T)
+      names(min_df) <- c(id,'MIN_TIME_FOR_EACH_ID')
+      max_df <- merge(max_df,min_df,all=T)
+
+      if(increasing) {id_order <-  max_df[order(max_df$MAX_TIME_FOR_EACH_ID,max_df$MIN_TIME_FOR_EACH_ID),id]
+      }else id_order <-  max_df[order(max_df$MAX_TIME_FOR_EACH_ID,max_df$MIN_TIME_FOR_EACH_ID,decreasing = T),id]
+    }
+
 
   }
   if (id_order[1] %in% names(df)) {
@@ -218,270 +243,8 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
   return(plot)
 
 }
-{
 
-  #Check deprecated id_order = increasing or decreasing
-  if(!is.null(id_order)) {
-    if(id_order[1] %in% c("increasing",'decreasing')){
-      warning("Increasing/decreasing have been deprecated as options for id_order use increasing=TRUE or increasing=FALSE instead",
-              call. = FALSE)
 
-      if(id_order[1]=="increasing") increasing = TRUE
-      if(id_order[1]=="decreasing") increasing = FALSE
-
-      id_order = NULL
-    }
-  }
-
-
-  df[,id] <- as.character(df[,id])
-
-
-  if(is.null(id_order)){
-
-    max_df <- stats::aggregate(df[,end]~df[,id],FUN=max,na.rm=T)
-    names(max_df) <- c(id,'MAX_TIME_FOR_EACH_ID')
-    if(increasing) {id_order <-  max_df[order(max_df$MAX_TIME_FOR_EACH_ID),id]
-
-    }else id_order <-  max_df[order(max_df$MAX_TIME_FOR_EACH_ID,decreasing = T),id]
-
-  }
-
-
-
-  if (id_order[1] %in% names(df)) {
-    max_df <- stats::aggregate(df[,end]~df[,id],FUN=max,na.rm=T)
-    names(max_df) <- c(id,'MAX_TIME_FOR_EACH_ID')
-    merged_df_with_max <- merge(max_df,df,all=F)
-    starting_df <-  stats::aggregate(df[,end]~df[,id],FUN=min,na.rm=T)
-    names(starting_df) <- c(id,end)
-    starting_information <- merge(starting_df,merged_df_with_max,all=F)
-    if(increasing) {id_order <- starting_information[order(starting_information[,id_order[1]], -rank(starting_information$MAX_TIME_FOR_EACH_ID), decreasing = TRUE),id]
-    }else id_order <- starting_information[order(starting_information[,id_order[1]], rank(starting_information$MAX_TIME_FOR_EACH_ID), decreasing = TRUE),id]
-
-  }
-
-  df <- df[order(df[,id],df[,end]),]
-  #Filling in any gaps (Adding empty bars at 0 and between sections)
-  if(start %in% names(df)){
-
-    ##Checking there are not overlapping sections
-    check_for_overlap <- function(data,id,start,end,x){
-      single <- data[data[,id]==x,]
-      if(dim(single)[1]>1){
-        single <- single[order(single[,start]),]
-        check_val <- min(single[,start]-dplyr::lag(single[,end]),na.rm = T)
-        if(check_val<0) return(x)
-      }
-    }
-
-
-    overlap <- unlist(sapply(unique(df[,id]), check_for_overlap,start=start,end=end,data=df,id=id))
-
-
-    if(length(overlap)>0) {stop(paste0(    paste0("There is(are) ", length(overlap)," id(s) with overlap between bars, they are ",id ,"=(",paste (overlap,sep="", collapse=","),")")))}
-
-    add_in <- function(id_fix,df,start,end){
-      df_fix <- df[df[,id]==id_fix,]
-
-      #Starting bar at 0
-      start_time_pat <- 0
-
-      #If the bar starts before 0 that is okay too
-      if(min(df_fix[,start])<0) start_time_pat <- min(df_fix[,start])
-
-      #Looking for gaps between the bars
-      end_blank <- df_fix[,start][c(start_time_pat,dplyr::lag(df_fix[,end])[-1]) != df_fix[,start]]
-      if(length(end_blank)==0) return(df_fix)
-      start_blank <- c(start_time_pat,dplyr::lag(df_fix[,end])[-1])[c(start_time_pat,dplyr::lag(df_fix[,end])[-1]) != df_fix[,start]]
-      df_fixed <- data.frame(id_fix,start_blank,end_blank)
-      names(df_fixed) <- c(id,start,end)
-      return(merge(df_fixed,df_fix,all=T))
-    }
-    df <- do.call(rbind.data.frame,sapply(unique(df[,id]), add_in,df=df,start=start,end=end,simplify = F))
-
-
-  }else {
-    start = 'starting_bars_variable'
-    df$starting_bars_variable <- stats::ave(df[,end], df[,id], FUN=dplyr::lag)
-    df$starting_bars_variable[is.na(df$starting_bars_variable)] <- 0
-  }
-
-  #Calculating the length of the bar for that section
-  temp_end <- df[,end] - as.numeric(as.character(df[,start]))
-
-  #Sections that are negative have to have a negative length
-  temp_end[as.numeric(as.character(df[,start]))<0] <- 0 - temp_end[as.numeric(as.character(df[,start]))<0]
-
-
-
-  #Sections that are negative have to have a negative length
-  temp_end[as.numeric(as.character(df$start))<0] <- 0 - temp_end[as.numeric(as.character(df$start))<0]
-
-  #This column is the length of the bar section. The end column name is used so the x axis has the correct label
-  df[,end] <- temp_end
-
-
-  df <- data.frame(df)
-
-  starting_times <- sort(unique(df[,start]),decreasing = TRUE)
-
-  ##Negative times need to be in backwards order to stack properly
-  starting_times[starting_times<0] <- rev(starting_times[starting_times<0])
-
-
-  df[,start] <- factor(df[,start],starting_times)
-  df[, id] <- factor(df[, id], levels = id_order)
-
-  plot <-
-    ggplot2::ggplot(df) +
-    ggplot2::geom_col(position = "stack",
-                      ggplot2::aes_string(fill = name_fill,col = name_col,alpha=name_alpha, group = start,x = id, y = end),...) + ggplot2::coord_flip() +
-    ggplot2::theme_bw(base_size = base_size) +
-    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),panel.grid.major = ggplot2::element_blank())
-
-
-  if(stratify[1]!=FALSE) plot <-  plot + ggplot2::facet_wrap(stats::as.formula(paste("~",paste(stratify,collapse = "+"))),scales = "free_y")+
-    ggplot2::theme(strip.background = ggplot2::element_rect(colour="black", fill="white"))
-
-
-  if(identifiers==FALSE) plot <-  plot + ggplot2::theme(axis.title.y=ggplot2::element_blank(),
-                                                        axis.text.y=ggplot2::element_blank(),
-                                                        axis.ticks.y=ggplot2::element_blank())
-
-  return(plot)
-
-}
-
-{
-
-  #Check deprecated id_order = increasing or decreasing
-  if(!is.null(id_order)) {
-    if(id_order[1] %in% c("increasing",'decreasing')){
-      warning("Increasing/decreasing have been deprecated as options for id_order use increasing=TRUE or increasing=FALSE instead",
-              call. = FALSE)
-
-      if(id_order[1]=="increasing") increasing = TRUE
-      if(id_order[1]=="decreasing") increasing = FALSE
-
-      id_order = NULL
-    }
-  }
-
-
-  df[,id] <- as.character(df[,id])
-
-
-  if(is.null(id_order)){
-
-    max_df <- stats::aggregate(df[,end]~df[,id],FUN=max,na.rm=T)
-    names(max_df) <- c(id,'MAX_TIME_FOR_EACH_ID')
-    if(increasing) {id_order <-  max_df[order(max_df$MAX_TIME_FOR_EACH_ID),id]
-
-    }else id_order <-  max_df[order(max_df$MAX_TIME_FOR_EACH_ID,decreasing = T),id]
-
-  }
-
-
-
-  if (id_order[1] %in% names(df)) {
-    max_df <- stats::aggregate(df[,end]~df[,id],FUN=max,na.rm=T)
-    names(max_df) <- c(id,'MAX_TIME_FOR_EACH_ID')
-    merged_df_with_max <- merge(max_df,df,all=F)
-    starting_df <-  stats::aggregate(df[,end]~df[,id],FUN=min,na.rm=T)
-    names(starting_df) <- c(id,end)
-    starting_information <- merge(starting_df,merged_df_with_max,all=F)
-    if(increasing) {id_order <- starting_information[order(starting_information[,id_order[1]], -rank(starting_information$MAX_TIME_FOR_EACH_ID), decreasing = TRUE),id]
-    }else id_order <- starting_information[order(starting_information[,id_order[1]], rank(starting_information$MAX_TIME_FOR_EACH_ID), decreasing = TRUE),id]
-
-  }
-
-  df <- df[order(df[,id],df[,end]),]
-  #Filling in any gaps (Adding empty bars at 0 and between sections)
-  if(start %in% names(df)){
-
-    ##Checking there are not overlapping sections
-    check_for_overlap <- function(data,id,start,end,x){
-      single <- data[data[,id]==x,]
-      if(dim(single)[1]>1){
-        single <- single[order(single[,start]),]
-        check_val <- min(single[,start]-dplyr::lag(single[,end]),na.rm = T)
-        if(check_val<0) return(x)
-      }
-    }
-
-
-    overlap <- unlist(sapply(unique(df[,id]), check_for_overlap,start=start,end=end,data=df,id=id))
-
-
-    if(length(overlap)>0) {stop(paste0(    paste0("There is(are) ", length(overlap)," id(s) with overlap between bars, they are ",id ,"=(",paste (overlap,sep="", collapse=","),")")))}
-
-    add_in <- function(id_fix,df,start,end){
-      df_fix <- df[df[,id]==id_fix,]
-
-      #Starting bar at 0
-      start_time_pat <- 0
-
-      #If the bar starts before 0 that is okay too
-      if(min(df_fix[,start])<0) start_time_pat <- min(df_fix[,start])
-
-      #Looking for gaps between the bars
-      end_blank <- df_fix[,start][c(start_time_pat,dplyr::lag(df_fix[,end])[-1]) != df_fix[,start]]
-      if(length(end_blank)==0) return(df_fix)
-      start_blank <- c(start_time_pat,dplyr::lag(df_fix[,end])[-1])[c(start_time_pat,dplyr::lag(df_fix[,end])[-1]) != df_fix[,start]]
-      df_fixed <- data.frame(id_fix,start_blank,end_blank)
-      names(df_fixed) <- c(id,start,end)
-      return(merge(df_fixed,df_fix,all=T))
-    }
-    df <- do.call(rbind.data.frame,sapply(unique(df[,id]), add_in,df=df,start=start,end=end,simplify = F))
-
-
-  }else {
-    start = 'starting_bars_variable'
-    df$starting_bars_variable <- stats::ave(df[,end], df[,id], FUN=dplyr::lag)
-    df$starting_bars_variable[is.na(df$starting_bars_variable)] <- 0
-  }
-
-  #Calculating the length of the bar for that section
-  temp_end <- df[,end] - as.numeric(as.character(df[,start]))
-
-  #Sections that are negative have to have a negative length
-  temp_end[as.numeric(as.character(df[,start]))<0] <- 0 - temp_end[as.numeric(as.character(df[,start]))<0]
-
-  #This column is the length of the bar section. The end column name is used so the x axis has the correct label
-  df[,end] <- temp_end
-
-
-  df <- data.frame(df)
-
-  starting_times <- sort(unique(df[,start]),decreasing = TRUE)
-
-  ##Negative times need to be in backwards order to stack properly
-  starting_times[starting_times<0] <- rev(starting_times[starting_times<0])
-
-
-  df[,start] <- factor(df[,start],starting_times)
-  df[, id] <- factor(df[, id], levels = id_order)
-
-  plot <-
-    ggplot2::ggplot(df) +
-    ggplot2::geom_col(position = "stack",
-                      ggplot2::aes_string(fill = name_fill,col = name_col,alpha=name_alpha, group = start,x = id, y = end),...) + ggplot2::coord_flip() +
-    ggplot2::theme_bw(base_size = base_size) +
-    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),panel.grid.major = ggplot2::element_blank())
-
-
-  if(stratify[1]!=FALSE) plot <-  plot + ggplot2::facet_wrap(stats::as.formula(paste("~",paste(stratify,collapse = "+"))),scales = "free_y")+
-    ggplot2::theme(strip.background = ggplot2::element_rect(colour="black", fill="white"))
-
-
-  if(identifiers==FALSE) plot <-  plot + ggplot2::theme(axis.title.y=ggplot2::element_blank(),
-                                                        axis.text.y=ggplot2::element_blank(),
-                                                        axis.ticks.y=ggplot2::element_blank())
-
-  return(plot)
-
-}
 
 
 # swimmer_points ------------------------------------------------------------
