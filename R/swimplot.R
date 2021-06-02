@@ -596,7 +596,7 @@ swimmer_points_from_lines <- function(df_lines,id='id',start = 'start',end = 'en
 swimmer_arrows <- function(df_arrows,id='id',arrow_start='end',cont=NULL,adj.y=0,name_col=NULL,arrow_positions=c(0.1,1),angle=30,
                            length = 0.1,type='closed',...){
 
-  df_arrows[,name_col] <- factor(df_arrows[,name_col])
+  if(!is.null(name_col))  df_arrows[,name_col] <- factor(df_arrows[,name_col])
 
   if(!is.null(cont)){
     df_arrows <- df_arrows[!is.na(df_arrows[,cont]),]
