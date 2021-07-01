@@ -69,7 +69,7 @@
 #'start=c(-5,-3,-1,-5,-6,-3,-3,-5,3,0,0,0,2,5,10),
 #'end=c(-3,-1,0,-2,-4,-1,3,-3,6,5,6,7,5,8,12),
 #'Dose=c(10,30,10,20,20,20,30,5,5,12,18,22,30,20,10))
-#'swimmer_plot(negative_data,name_fill = 'Dose',col='black',alpha=0.9)+
+#'swimmer_plot(negative_data,name_fill = 'Dose',alpha=0.9)+
 #'  ggplot2::theme_bw()+
 #'  ggplot2::geom_hline(yintercept = 0,lwd=2,col='red') +
 #'  ggplot2::scale_fill_gradient(low = "grey90", high = "grey10", na.value = NA)+
@@ -79,8 +79,74 @@
 #' @export
 swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_col=NULL,name_alpha=NULL,
                          increasing=TRUE,id_order = NULL,
-                         stratify=FALSE,base_size=11,identifiers=TRUE,...)
+                         stratify=NULL,base_size=11,identifiers=TRUE,...)
 {
+
+  if(!is.null(stratify))  {
+    if(any(duplicated(unique(df[,c(id,stratify)])[,id]))){
+    warning("Can not stratify when ids are in multiple strata")
+    stratify=NULL
+  }}
+
+
+  #Not letting the name_fill be id,start or end
+  if(!is.null(name_fill)){
+    if( name_fill==id) {
+      df$ID_FOR_FILL <- df[,id]
+      name_fill = 'ID_FOR_FILL'
+    }
+
+    if(name_fill==start) {
+      df$START_FOR_FILL <- df[,start]
+      name_fill = 'START_FOR_FILL'
+    }
+
+    if(name_fill==end) {
+      df$END_FOR_FILL <- df[,end]
+      name_fill = 'END_FOR_FILL'
+    }
+  }
+
+
+  #Not letting the name_col be id,start or end
+  if(!is.null(name_col)){
+    if(name_col==id) {
+      df$ID_FOR_COL <- df[,id]
+      name_col = 'ID_FOR_COL'
+    }
+
+    if(name_col==start) {
+      df$START_FOR_COL <- df[,start]
+      name_col = 'START_FOR_COL'
+    }
+
+    if(name_col==end) {
+      df$END_FOR_COL <- df[,end]
+      name_col = 'END_FOR_COL'
+    }
+  }
+
+
+  #Not letting the name_alpha be id,start or end
+  if(!is.null(name_alpha)){
+
+  if(name_alpha==id) {
+    df$ID_FOR_ALPHA <- df[,id]
+    name_alpha = 'ID_FOR_ALPHA'
+  }
+
+  if(name_alpha==start) {
+    df$START_FOR_ALPHA <- df[,start]
+    name_alpha = 'START_FOR_ALPHA'
+  }
+
+  if(name_alpha==end) {
+    df$END_FOR_ALPHA <- df[,end]
+    name_alpha = 'END_FOR_ALPHA'
+  }
+}
+
+###
 
   #Check deprecated id_order = increasing or decreasing
   if(!is.null(id_order)) {
@@ -118,8 +184,7 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
     }
 
 
-  }
-  if (id_order[1] %in% names(df)) {
+  }else if (id_order[1] %in% names(df)) {
     max_df <- stats::aggregate(df[,end]~df[,id],FUN=max,na.rm=T)
     names(max_df) <- c(id,'MAX_TIME_FOR_EACH_ID')
     merged_df_with_max <- merge(max_df,df,all=F)
@@ -132,7 +197,9 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
   }
 
   df <- df[order(df[,id],df[,end]),]
-  #Filling in any gaps (Adding empty bars at 0 and between sections)
+
+  #If the start time is given a test for overlap is done
+  #Sections are filled in where needed (Between bars, up to zero, before zero)
   if(start %in% names(df)){
 
     ##Checking there are not overlapping sections
@@ -156,8 +223,17 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
 
       ##Filling in space up to 0
       if(max(df_fix[,end])<0){
-        df_fixed <- data.frame(id_fix,max(df_fix[,end]),0)
-        names(df_fixed) <- c(id,start,end)
+
+
+        if(!is.null(stratify)){
+          df_fixed <- data.frame(id_fix,max(df_fix[,end]),0,df_fix[,stratify])
+          names(df_fixed) <- c(id,start,end,stratify)
+        }else{
+          df_fixed <- data.frame(id_fix,max(df_fix[,end]),0)
+          names(df_fixed) <- c(id,start,end)
+        }
+
+
         df_fix <- merge(df_fixed,df_fix,all=T)
       }
 
@@ -175,8 +251,17 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
 
       ##start times of the filler are the previous end time
       start_blank <- c(start_time_pat,dplyr::lag(df_fix[,end])[-1])[c(start_time_pat,dplyr::lag(df_fix[,end])[-1]) != df_fix[,start]]
-      df_fixed <- data.frame(id_fix,start_blank,end_blank)
-      names(df_fixed) <- c(id,start,end)
+
+      if(!is.null(stratify)){
+        df_fixed <- data.frame(id_fix,start_blank,end_blank,df_fix[,stratify])
+        names(df_fixed) <- c(id,start,end,stratify)
+      }else{
+        df_fixed <- data.frame(id_fix,start_blank,end_blank)
+        names(df_fixed) <- c(id,start,end)
+
+      }
+
+
       return(merge(df_fixed,df_fix,all=T))
     }
     df <- do.call(rbind.data.frame,sapply(unique(df[,id]), add_in,df=df,start=start,end=end,simplify = F))
@@ -232,7 +317,7 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
     ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),panel.grid.major = ggplot2::element_blank())
 
 
-  if(stratify[1]!=FALSE) plot <-  plot + ggplot2::facet_wrap(stats::as.formula(paste("~",paste(stratify,collapse = "+"))),scales = "free_y")+
+  if(!is.null(stratify)) plot <-  plot + ggplot2::facet_wrap(stats::as.formula(paste("~",paste(stratify,collapse = "+"))),scales = "free_y")+
     ggplot2::theme(strip.background = ggplot2::element_rect(colour="black", fill="white"))
 
 
