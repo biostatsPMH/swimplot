@@ -102,7 +102,7 @@ negative_data <- data.frame(id=c(1,1,1,2,3,3,4,5,5,6,7,8,9,9,9),
 start=c(-5,-3,-1,-5,-6,-3,-3,-5,3,0,0,0,2,5,10),
 end=c(-3,-1,0,-2,-4,-1,3,-3,6,5,6,7,5,8,12),
 Dose=c(10,30,10,20,20,20,30,5,5,12,18,22,30,20,10))
-swimmer_plot(negative_data,name_fill = 'Dose',col='black',alpha=0.9)+
+swimmer_plot(negative_data,name_fill = 'Dose',alpha=0.9)+
  ggplot2::theme_bw()+
  ggplot2::geom_hline(yintercept = 0,lwd=2,col='red') +
  ggplot2::scale_fill_gradient(low = "grey90", high = "grey10", na.value = NA)+
