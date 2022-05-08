@@ -81,7 +81,7 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
     }
   }
 
-
+  df = as.data.frame(df) # in case of df was a tibble, fixes error like "invalid type (list) for variable 'df[, end]' "  
   df[,id] <- as.character(df[,id])
 
 
@@ -112,15 +112,52 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
   df <- df[order(df[,id],df[,end]),]
   ##Filling in any gaps (Adding empty bars at 0 and between sections)
   if(start %in% names(df)){
-    add_in <- function(id_fix,df,start,end){
-      df_fix <- df[df[,id]==id_fix,]
-      end_blank <- df_fix[,start][c(0,dplyr::lag(df_fix[,end])[-1]) != df_fix[,start]]
-      start_blank <- c(0,dplyr::lag(df_fix[,end])[-1])[c(0,dplyr::lag(df_fix[,end])[-1]) != df_fix[,start]]
-      df_fixed <- data.frame(id_fix,start_blank,end_blank)
-      names(df_fixed) <- c(id,start,end)
-      merge(df_fixed,df_fix,all=T)
-    }
-    df <- do.call(rbind.data.frame,sapply(unique(df[,id]), add_in,df=df,start=start,end=end,simplify = F))
+        fix_in <- function(id_fix,df,start,end){
+            df_2fix <- df[df[,id]==id_fix,]
+            names=names(df_2fix)
+            od = order(df_2fix[,start])
+            df_2fix=df_2fix[od,]
+            n=nrow(df_2fix)
+            i=1
+            while (i < n) {
+                a=df_2fix[i,end]
+                b=df_2fix[i+1,start]
+                if(a!=b){  
+                  # here we should detect blank or overlapping time periods the fixing is different 
+                  # fixes also this error "arguments imply differing number of rows: 1, 0"
+
+                    if (b>a) {
+                        warning("Your data contains some blank time ", 
+                                call. = FALSE)
+                        df_2fix[(i+2):(nrow(df_2fix)+1),]=df_2fix[(i+1):nrow(df_2fix),]
+                        df_2fix[(i+2),start]=b
+                        df_2fix[i+1,]=NA
+                        df_2fix[i+1,start]=a
+                        df_2fix[i+1,end]= b
+                        df_2fix[i+1,id]=id_fix 
+                        if(name_fill%in%names) df_2fix[i+1,name_fill]="blank_time"
+                        
+                    } else {
+                        warning("Your data contains some overlapping time ", 
+                                call. = FALSE)
+                        df_2fix[(i+2):(nrow(df_2fix)+1),]=df_2fix[(i+1):nrow(df_2fix),]
+                        df_2fix[(i+2),start]=a
+                        df_2fix[i,end]=b
+                        df_2fix[i+1,]=NA
+                        df_2fix[i+1,start]=b
+                        df_2fix[i+1,end]= a
+                        df_2fix[i+1,id]=id_fix
+                        if(name_fill%in%names) df_2fix[i+1,name_fill]="overlapping_time"
+                        
+                    }
+                }
+                i=i+2
+                n=nrow(df_2fix)
+            }
+            df_fixed = df_2fix
+        }
+
+    df <- do.call(rbind.data.frame,sapply(unique(df[,id]), fix_in,df=df,start=start,end=end,simplify = F))
 
 
   }else {
