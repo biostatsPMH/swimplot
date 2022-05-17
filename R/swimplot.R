@@ -123,9 +123,9 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
                 a=df_2fix[i,end]
                 b=df_2fix[i+1,start]
                 if(a!=b){  
-                  # here we should detect blank or overlapping time periods the fixing is different 
-                  # fixes also this error "arguments imply differing number of rows: 1, 0"
-
+                    # here we should detect blank or overlapping time periods the fixing is different 
+                    # fixes also this error "arguments imply differing number of rows: 1, 0"
+                    
                     if (b>a) {
                         warning("Your data contains some blank time ", 
                                 call. = FALSE)
@@ -137,7 +137,7 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
                         df_2fix[i+1,id]=id_fix 
                         if(name_fill%in%names) df_2fix[i+1,name_fill]="blank_time"
                         
-                    } else {
+                    } else if (a>b & a<df_2fix[i+1,end]) {
                         warning("Your data contains some overlapping time ", 
                                 call. = FALSE)
                         df_2fix[(i+2):(nrow(df_2fix)+1),]=df_2fix[(i+1):nrow(df_2fix),]
@@ -149,6 +149,18 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
                         df_2fix[i+1,id]=id_fix
                         if(name_fill%in%names) df_2fix[i+1,name_fill]="overlapping_time"
                         
+                    }
+                    else{
+                        warning("Your data contains some arms included in others ", 
+                                call. = FALSE)
+                        df_2fix[(i+2):(nrow(df_2fix)+1),]=df_2fix[(i+1):nrow(df_2fix),]
+                        df_2fix[(i+2),start]=df_2fix[i+1,end]
+                        df_2fix[i,end]=b
+                        df_2fix[i+1,]=NA
+                        df_2fix[i+1,start]=b
+                        df_2fix[i+1,end]= df_2fix[(i+2),start]
+                        df_2fix[i+1,id]=id_fix
+                        if(name_fill%in%names) df_2fix[i+1,name_fill]="included_time"                    
                     }
                 }
                 i=i+2
