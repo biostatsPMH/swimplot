@@ -166,8 +166,7 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
     df$starting_bars_variable[is.na(df$starting_bars_variable)] <- 0
   }
 
-  temp_end <- df[,end] - stats::ave(df[,end], df[,id], FUN=dplyr::lag)
-  df[,end][!is.na(temp_end)] <- temp_end[!is.na(temp_end)]
+
 
 
 
