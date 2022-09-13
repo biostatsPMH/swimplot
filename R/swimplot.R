@@ -82,6 +82,7 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
                          stratify=NULL,base_size=11,identifiers=TRUE,...)
 {
 
+
   if(!is.null(stratify))  {
     if(any(duplicated(unique(df[,c(id,stratify)])[,id]))){
     warning("Can not stratify when ids are in multiple strata")
@@ -201,6 +202,14 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
   #If the start time is given a test for overlap is done
   #Sections are filled in where needed (Between bars, up to zero, before zero)
   if(start %in% names(df)){
+
+    ###ADDING A FILL COLUMN IF THERE IS NOT ONE SO THE SPACES ARE BLANK
+    if(is.null(name_fill) & !all(df[,start]==1) ){
+      name_fill <- "Colour_for_spaces"
+      df[,name_fill] <- "fill"
+
+    }
+
 
     ##Checking there are not overlapping sections
     check_for_overlap <- function(data,id,start,end,x){

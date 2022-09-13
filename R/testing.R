@@ -113,10 +113,12 @@ swimmer_plot(df,name_fill='group2',stratify = c('group1','group2'))
 
 # No changes some positive some negative ----------------------------------
 
-df <- data.frame(id=c(1,2,3,4,5),start=c(-5,-4,0,1,2),end=c(-1,2,3,4,5),col=c(1,2,3,4,5),group1=c(5,5,5,10,10),group2=c('A',"B","B","A","C"))
+df <- data.frame(id=c(1,2,3,4,5),
+                 start=c(-5,-4,0,1,2),end=c(-1,2,3,4,5),col=c(1,2,3,4,5),group1=c(5,5,5,10,10),group2=c('A',"B","B","A","C"))
 
 ##BASIC
-swimmer_plot(df)
+swimmer_plot(df)+ggplot2::scale_fill_manual(name="Treatment",
+                                            values=c("#e41a1c",na.value=NA))+ ggplot2::theme(legend.position = "none")
 ##FILL BY ID
 swimmer_plot(df,name_fill='id')
 ##FILL BY CONTINUOUS
