@@ -6,9 +6,6 @@ Note that the README.md document may need updating to change
 
 # swimplot
 
-**swimplot** is a package that works with **ggplot2** to create swimmer
-plots.
-
 Swimmer plots are used to show a patient’s response over time
 (i.e. days), or by treatment course cycle.
 
