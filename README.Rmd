@@ -1,30 +1,42 @@
+---
+output: github_document
+always_allow_html: true
+---
 
 <!-- This file is used to create README.md
 Note that the README.md document may need updating to change
 '\<0.001' to '<0.001'. 
 -->
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+
+```
+
 # swimplot
 
-**swimplot** is a package that works with **ggplot2** to create swimmer
-plots.
+**swimplot** is a package that works with **ggplot2** to create swimmer plots. 
 
-Swimmer plots are used to show a patient’s response over time
-(i.e. days), or by treatment course cycle.
+Swimmer plots are used to show a patient's response over time (i.e. days), or by treatment course cycle. 
+
 
 ## Installation
 
-You can install the main version of **swimplot** from
-[GitHub](https://github.com/) with:
+You can install the main version of **swimplot** from [GitHub](https://github.com/) with:
+
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("biostatsPMH/swimplot", ref="main")
 ```
 
-An alternative version of **swimplot** which allows for patterns in the
-bars (eg. stripes) can be installed from [GitHub](https://github.com/)
-with:
+An alternative version of **swimplot** which allows for patterns in the bars (eg. stripes) can be installed from [GitHub](https://github.com/) with:
+
 
 ``` r
 # install.packages("devtools")
@@ -37,15 +49,13 @@ devtools::install_github("biostatsPMH/swimplot", ref="pattern")
 
 ## Examples
 
-### Swimmer plot that includes AE event status by course cycle
+### Swimmer plot that includes AE event status by course cycle 
 
-Uses addendum fake study data. The below swimmer plot stratifies by sex,
-but all participants are female.
+Uses addendum fake study data. The below swimmer plot stratifies by sex, but all participants are female.
 
-The *width*, *height* and *scale* parameters in ggsave() can be modified
-to fit a large plot.
+The *width*, *height* and *scale* parameters in ggsave() can be modified to fit a large plot.
 
-``` r
+```{r example1a, message=F, warning=F}
 library(ggplot2);
 library(swimplot);
 data("arm", "res", "ae");
@@ -68,11 +78,14 @@ p <- swimmer_plot(df=arm,id='SUBJECT',end='END_TRT',name_fill='ARM',id_order ='i
 ggsave(paste("man/figures/clin_trial_SEX", ".png", sep=""), p, width=6.4, height=6.4, device="png", scale=1);
 ```
 
-<img src="man/figures/clin_trial_SEX.png" width="100%" />
+```{r example1b, echo=FALSE, out.width='100%'}
+knitr::include_graphics(paste("man/figures/clin_trial_SEX", ".png", sep=""))
+```
+
 
 The next swimmer plot stratifies by sex and age category.
 
-``` r
+```{r example2a, message=F, warning=F}
 library(ggplot2);
 library(swimplot);
 data("arm", "res", "ae");
@@ -95,4 +108,6 @@ p <- swimmer_plot(df=arm,id='SUBJECT',end='END_TRT',name_fill='ARM',id_order ='i
 ggsave(paste("man/figures/clin_trial_SEX_AGE", ".png", sep=""), p, width=6.4, height=6.4, device="png", scale=1);
 ```
 
-<img src="man/figures/clin_trial_SEX_AGE.png" width="100%" />
+```{r example2b, echo=FALSE, out.width='100%'}
+knitr::include_graphics(paste("man/figures/clin_trial_SEX_AGE", ".png", sep=""))
+```
