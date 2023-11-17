@@ -12,8 +12,8 @@ output:
         collapse: none
         scroll_highlight: yes
         before: |
-          <li> &nbsp;&nbsp; BiostatsUHNplus    </li>
-          <li> &nbsp;&nbsp; PMH Biostatistics</li>
+          <li> &nbsp;&nbsp; swimplot    </li>
+          <li> &nbsp;&nbsp; Biostatistics@UHN</li>
       edit : null
       search: yes
       sharing:
