@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>7 swimplot | Creating swimmer plots with ease</title>
+  <meta name="description" content="7 swimplot | Creating swimmer plots with ease" />
+  <meta name="generator" content="bookdown 0.36 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="7 swimplot | Creating swimmer plots with ease" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="7 swimplot | Creating swimmer plots with ease" />
+  
+  
+  
+
+<meta name="author" content="Jessica Weiss" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="when-there-are-multiple-column-per-event-type.html"/>
+
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li> &nbsp;&nbsp; BiostatsUHNplus    </li>
+<li> &nbsp;&nbsp; PMH Biostatistics</li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction to swimmers plots</a></li>
+<li class="chapter" data-level="2" data-path="a-working-example.html"><a href="a-working-example.html"><i class="fa fa-check"></i><b>2</b> A working example</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="a-working-example.html"><a href="a-working-example.html#the-data-and-research-question"><i class="fa fa-check"></i><b>2.1</b> The Data and research question</a></li>
+<li class="chapter" data-level="2.2" data-path="a-working-example.html"><a href="a-working-example.html#basic-plot"><i class="fa fa-check"></i><b>2.2</b> Basic plot</a></li>
+<li class="chapter" data-level="2.3" data-path="a-working-example.html"><a href="a-working-example.html#modifying-the-order-and-colours-of-the-bars"><i class="fa fa-check"></i><b>2.3</b> Modifying the order and colours of the bars</a></li>
+<li class="chapter" data-level="2.4" data-path="a-working-example.html"><a href="a-working-example.html#stratification"><i class="fa fa-check"></i><b>2.4</b> Stratification</a></li>
+<li class="chapter" data-level="2.5" data-path="a-working-example.html"><a href="a-working-example.html#adding-points"><i class="fa fa-check"></i><b>2.5</b> Adding points</a></li>
+<li class="chapter" data-level="2.6" data-path="a-working-example.html"><a href="a-working-example.html#adding-lines"><i class="fa fa-check"></i><b>2.6</b> Adding lines</a></li>
+<li class="chapter" data-level="2.7" data-path="a-working-example.html"><a href="a-working-example.html#adding-lines-and-points-together"><i class="fa fa-check"></i><b>2.7</b> Adding lines and points together</a></li>
+<li class="chapter" data-level="2.8" data-path="a-working-example.html"><a href="a-working-example.html#adding-arrows"><i class="fa fa-check"></i><b>2.8</b> Adding arrows</a></li>
+<li class="chapter" data-level="2.9" data-path="a-working-example.html"><a href="a-working-example.html#making-the-plots-more-aesthetically-pleasing-with-ggplot-manipulations"><i class="fa fa-check"></i><b>2.9</b> Making the plots more aesthetically pleasing with ggplot manipulations</a>
+<ul>
+<li class="chapter" data-level="2.9.1" data-path="a-working-example.html"><a href="a-working-example.html#modifying-colours-and-shapes"><i class="fa fa-check"></i><b>2.9.1</b> Modifying Colours and shapes</a></li>
+<li class="chapter" data-level="2.9.2" data-path="a-working-example.html"><a href="a-working-example.html#legends"><i class="fa fa-check"></i><b>2.9.2</b> Legends</a></li>
+<li class="chapter" data-level="2.9.3" data-path="a-working-example.html"><a href="a-working-example.html#add-arrows-to-the-legend"><i class="fa fa-check"></i><b>2.9.3</b> Add arrows to the legend</a></li>
+<li class="chapter" data-level="2.9.4" data-path="a-working-example.html"><a href="a-working-example.html#axis"><i class="fa fa-check"></i><b>2.9.4</b> axis</a></li>
+<li class="chapter" data-level="2.9.5" data-path="a-working-example.html"><a href="a-working-example.html#formatting-the-legend-when-an-aesthetic-is-mapped-in-multiple-layers"><i class="fa fa-check"></i><b>2.9.5</b> Formatting the legend when an aesthetic is mapped in multiple layers</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="more-complex-data-structures.html"><a href="more-complex-data-structures.html"><i class="fa fa-check"></i><b>3</b> More complex data structures</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="more-complex-data-structures.html"><a href="more-complex-data-structures.html#gaps-between-sections-in-a-single-bar"><i class="fa fa-check"></i><b>3.1</b> Gaps between sections in a single bar</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="formatting-data.html"><a href="formatting-data.html"><i class="fa fa-check"></i><b>4</b> Formatting data</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="formatting-data.html"><a href="formatting-data.html#long-data"><i class="fa fa-check"></i><b>4.1</b> Long data</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="when-there-is-one-column-per-event-type.html"><a href="when-there-is-one-column-per-event-type.html"><i class="fa fa-check"></i><b>5</b> When there is one column per event type</a></li>
+<li class="chapter" data-level="6" data-path="when-there-are-multiple-column-per-event-type.html"><a href="when-there-are-multiple-column-per-event-type.html"><i class="fa fa-check"></i><b>6</b> When there are multiple column per event type</a></li>
+<li class="chapter" data-level="7" data-path="swimplot.html"><a href="swimplot.html"><i class="fa fa-check"></i><b>7</b> swimplot</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="swimplot.html"><a href="swimplot.html#installation"><i class="fa fa-check"></i><b>7.1</b> Installation</a></li>
+<li class="chapter" data-level="7.2" data-path="swimplot.html"><a href="swimplot.html#documentation"><i class="fa fa-check"></i><b>7.2</b> Documentation</a></li>
+<li class="chapter" data-level="7.3" data-path="swimplot.html"><a href="swimplot.html#examples"><i class="fa fa-check"></i><b>7.3</b> Examples</a>
+<ul>
+<li class="chapter" data-level="7.3.1" data-path="swimplot.html"><a href="swimplot.html#swimmer-plot-that-includes-ae-event-status-by-course-cycle"><i class="fa fa-check"></i><b>7.3.1</b> Swimmer plot that includes AE event status by course cycle</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Creating swimmer plots with ease</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="swimplot" class="section level1 hasAnchor" number="7">
+<h1><span class="header-section-number">7</span> swimplot<a href="swimplot.html#swimplot" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p><strong>swimplot</strong> is a package that works with <strong>ggplot2</strong> to create swimmer plots.</p>
+<p>Swimmer plots are used to show a patient’s response over time (i.e. days), or by treatment course cycle.</p>
+<div id="installation" class="section level2 hasAnchor" number="7.1">
+<h2><span class="header-section-number">7.1</span> Installation<a href="swimplot.html#installation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>You can install the main version of <strong>swimplot</strong> from <a href="https://github.com/">GitHub</a> with:</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="swimplot.html#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;devtools&quot;)</span></span>
+<span id="cb35-2"><a href="swimplot.html#cb35-2" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;biostatsPMH/swimplot&quot;</span>, <span class="at">ref=</span><span class="st">&quot;main&quot;</span>)</span></code></pre></div>
+<p>An alternative version of <strong>swimplot</strong> which allows for patterns in the bars (eg. stripes) can be installed from <a href="https://github.com/">GitHub</a> with:</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="swimplot.html#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;devtools&quot;)</span></span>
+<span id="cb36-2"><a href="swimplot.html#cb36-2" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;biostatsPMH/swimplot&quot;</span>, <span class="at">ref=</span><span class="st">&quot;pattern&quot;</span>)</span></code></pre></div>
+</div>
+<div id="documentation" class="section level2 hasAnchor" number="7.2">
+<h2><span class="header-section-number">7.2</span> Documentation<a href="swimplot.html#documentation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><a href="https://biostatsPMH.github.io/swimplot/">Online Documentation</a></p>
+</div>
+<div id="examples" class="section level2 hasAnchor" number="7.3">
+<h2><span class="header-section-number">7.3</span> Examples<a href="swimplot.html#examples" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="swimmer-plot-that-includes-ae-event-status-by-course-cycle" class="section level3 hasAnchor" number="7.3.1">
+<h3><span class="header-section-number">7.3.1</span> Swimmer plot that includes AE event status by course cycle<a href="swimplot.html#swimmer-plot-that-includes-ae-event-status-by-course-cycle" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Uses addendum fake study data. The below swimmer plot stratifies by sex, but all participants are female.</p>
+<p>The <em>width</em>, <em>height</em> and <em>scale</em> parameters in ggsave() can be modified to fit a large plot.</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="swimplot.html#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2);</span>
+<span id="cb37-2"><a href="swimplot.html#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(swimplot);</span>
+<span id="cb37-3"><a href="swimplot.html#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;arm&quot;</span>, <span class="st">&quot;res&quot;</span>, <span class="st">&quot;ae&quot;</span>);</span>
+<span id="cb37-4"><a href="swimplot.html#cb37-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-5"><a href="swimplot.html#cb37-5" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>RESPONSE <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(res<span class="sc">$</span>RESPONSE);</span>
+<span id="cb37-6"><a href="swimplot.html#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(res<span class="sc">$</span>RESPONSE) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;PD&quot;</span>, <span class="st">&quot;SD&quot;</span>, <span class="st">&quot;NE&quot;</span>, <span class="st">&quot;PR&quot;</span>, <span class="st">&quot;CR&quot;</span>);</span>
+<span id="cb37-7"><a href="swimplot.html#cb37-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-8"><a href="swimplot.html#cb37-8" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">swimmer_plot</span>(<span class="at">df=</span>arm,<span class="at">id=</span><span class="st">&#39;SUBJECT&#39;</span>,<span class="at">end=</span><span class="st">&#39;END_TRT&#39;</span>,<span class="at">name_fill=</span><span class="st">&#39;ARM&#39;</span>,<span class="at">id_order =</span><span class="st">&#39;increasing&#39;</span>,<span class="at">col=</span><span class="st">&quot;black&quot;</span>,<span class="at">alpha=</span><span class="fl">0.75</span>,<span class="at">width=</span>.<span class="dv">8</span>,<span class="at">base_size=</span><span class="dv">14</span>,<span class="at">stratify=</span> <span class="fu">c</span>(<span class="st">&#39;SEX&#39;</span>)) <span class="sc">+</span></span>
+<span id="cb37-9"><a href="swimplot.html#cb37-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">swimmer_lines</span>(<span class="at">df_lines=</span>res,<span class="at">id=</span><span class="st">&#39;SUBJECT&#39;</span>,<span class="at">start=</span><span class="st">&#39;RESPONSE_START&#39;</span>,<span class="at">end=</span><span class="st">&#39;RESPONSE_END&#39;</span>,<span class="at">name_col=</span><span class="st">&#39;RESPONSE&#39;</span>,<span class="at">size=</span><span class="dv">1</span>)<span class="sc">+</span></span>
+<span id="cb37-10"><a href="swimplot.html#cb37-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">swimmer_points</span>(<span class="at">df_points=</span>ae,<span class="at">id=</span><span class="st">&#39;SUBJECT&#39;</span>,<span class="at">time=</span><span class="st">&#39;COURSE_NUM&#39;</span>,<span class="at">name_shape=</span><span class="st">&#39;EVENT&#39;</span>,<span class="at">name_col=</span><span class="st">&#39;EVENT&#39;</span>,<span class="at">fill=</span><span class="st">&#39;white&#39;</span>,<span class="at">size=</span><span class="fu">c</span>(<span class="fl">1.25</span>, <span class="dv">3</span>)[<span class="fu">as.factor</span>(ae<span class="sc">$</span>EVENT)])<span class="sc">+</span></span>
+<span id="cb37-11"><a href="swimplot.html#cb37-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">swimmer_arrows</span>(<span class="at">df_arrows=</span>res,<span class="at">id=</span><span class="st">&#39;SUBJECT&#39;</span>,<span class="at">arrow_start=</span><span class="st">&#39;RESPONSE_END&#39;</span>,<span class="at">cont=</span><span class="st">&#39;CONTINUED_RESPONSE&#39;</span>,<span class="at">name_col=</span><span class="st">&#39;RESPONSE&#39;</span>,<span class="at">show.legend=</span><span class="cn">FALSE</span>,<span class="at">type=</span><span class="st">&quot;open&quot;</span>,<span class="at">cex=</span><span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb37-12"><a href="swimplot.html#cb37-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values=</span><span class="fu">c</span>(<span class="st">&#39;grey60&#39;</span>, <span class="st">&#39;grey90&#39;</span>))<span class="sc">+</span></span>
+<span id="cb37-13"><a href="swimplot.html#cb37-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">name=</span><span class="st">&#39;RESPONSE&#39;</span>,<span class="at">values=</span><span class="fu">c</span>(<span class="st">&#39;PD&#39;</span><span class="ot">=</span><span class="st">&#39;red&#39;</span>, <span class="st">&#39;SD&#39;</span><span class="ot">=</span><span class="st">&#39;magenta1&#39;</span>, <span class="st">&#39;NE&#39;</span><span class="ot">=</span><span class="st">&#39;gold&#39;</span>, <span class="st">&#39;PR&#39;</span><span class="ot">=</span><span class="st">&#39;chartreuse2&#39;</span>, <span class="st">&#39;CR&#39;</span><span class="ot">=</span><span class="st">&#39;turquoise2&#39;</span>, <span class="st">&#39;AE&#39;</span><span class="ot">=</span><span class="st">&#39;red&#39;</span>, <span class="st">&#39;SAE&#39;</span><span class="ot">=</span><span class="st">&#39;black&#39;</span>), <span class="at">breaks =</span> <span class="fu">c</span>(<span class="st">&#39;PD&#39;</span>, <span class="st">&#39;SD&#39;</span>, <span class="st">&#39;NE&#39;</span>, <span class="st">&#39;PR&#39;</span>, <span class="st">&#39;CR&#39;</span>))  <span class="sc">+</span></span>
+<span id="cb37-14"><a href="swimplot.html#cb37-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_shape_manual</span>(<span class="at">values=</span><span class="fu">c</span>(<span class="dv">21</span>, <span class="dv">8</span>))<span class="sc">+</span></span>
+<span id="cb37-15"><a href="swimplot.html#cb37-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">&quot;COURSE CYCLE&quot;</span>) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">&quot;SUBJECT&quot;</span>)<span class="sc">+</span></span>
+<span id="cb37-16"><a href="swimplot.html#cb37-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">minor_breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="fu">max</span>(arm<span class="sc">$</span>END_TRT), <span class="at">by=</span><span class="dv">2</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="fu">max</span>(arm<span class="sc">$</span>END_TRT), <span class="at">by=</span><span class="dv">4</span>))<span class="sc">+</span></span>
+<span id="cb37-17"><a href="swimplot.html#cb37-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.minor =</span> <span class="fu">element_line</span>(<span class="at">colour=</span><span class="st">&quot;grey95&quot;</span>, <span class="at">size=</span><span class="fl">0.5</span>))<span class="sc">+</span></span>
+<span id="cb37-18"><a href="swimplot.html#cb37-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">shape =</span> <span class="fu">guide_legend</span>(<span class="at">override.aes =</span> <span class="fu">list</span>(<span class="at">col=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>))),<span class="at">color=</span><span class="fu">guide_legend</span>(<span class="at">override.aes =</span> <span class="fu">list</span>(<span class="at">shape=</span><span class="cn">NA</span>)));</span>
+<span id="cb37-19"><a href="swimplot.html#cb37-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-20"><a href="swimplot.html#cb37-20" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="fu">paste</span>(<span class="st">&quot;man/figures/clin_trial_SEX&quot;</span>, <span class="st">&quot;.png&quot;</span>, <span class="at">sep=</span><span class="st">&quot;&quot;</span>), p, <span class="at">width=</span><span class="fl">6.4</span>, <span class="at">height=</span><span class="fl">6.4</span>, <span class="at">device=</span><span class="st">&quot;png&quot;</span>, <span class="at">scale=</span><span class="dv">1</span>);</span></code></pre></div>
+<p><img src="man/figures/clin_trial_SEX.png" width="100%" /></p>
+<p>The next swimmer plot stratifies by sex and age category.</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="swimplot.html#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2);</span>
+<span id="cb38-2"><a href="swimplot.html#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(swimplot);</span>
+<span id="cb38-3"><a href="swimplot.html#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;arm&quot;</span>, <span class="st">&quot;res&quot;</span>, <span class="st">&quot;ae&quot;</span>);</span>
+<span id="cb38-4"><a href="swimplot.html#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-5"><a href="swimplot.html#cb38-5" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>RESPONSE <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(res<span class="sc">$</span>RESPONSE);</span>
+<span id="cb38-6"><a href="swimplot.html#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(res<span class="sc">$</span>RESPONSE) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;PD&quot;</span>, <span class="st">&quot;SD&quot;</span>, <span class="st">&quot;NE&quot;</span>, <span class="st">&quot;PR&quot;</span>, <span class="st">&quot;CR&quot;</span>);</span>
+<span id="cb38-7"><a href="swimplot.html#cb38-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-8"><a href="swimplot.html#cb38-8" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">swimmer_plot</span>(<span class="at">df=</span>arm,<span class="at">id=</span><span class="st">&#39;SUBJECT&#39;</span>,<span class="at">end=</span><span class="st">&#39;END_TRT&#39;</span>,<span class="at">name_fill=</span><span class="st">&#39;ARM&#39;</span>,<span class="at">id_order =</span><span class="st">&#39;increasing&#39;</span>,<span class="at">col=</span><span class="st">&quot;black&quot;</span>,<span class="at">alpha=</span><span class="fl">0.75</span>,<span class="at">width=</span>.<span class="dv">8</span>,<span class="at">base_size=</span><span class="dv">14</span>,<span class="at">stratify=</span> <span class="fu">c</span>(<span class="st">&#39;SEX&#39;</span>,<span class="st">&#39;AGE&#39;</span>)) <span class="sc">+</span></span>
+<span id="cb38-9"><a href="swimplot.html#cb38-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">swimmer_lines</span>(<span class="at">df_lines=</span>res,<span class="at">id=</span><span class="st">&#39;SUBJECT&#39;</span>,<span class="at">start=</span><span class="st">&#39;RESPONSE_START&#39;</span>,<span class="at">end=</span><span class="st">&#39;RESPONSE_END&#39;</span>,<span class="at">name_col=</span><span class="st">&#39;RESPONSE&#39;</span>,<span class="at">size=</span><span class="dv">1</span>)<span class="sc">+</span></span>
+<span id="cb38-10"><a href="swimplot.html#cb38-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">swimmer_points</span>(<span class="at">df_points=</span>ae,<span class="at">id=</span><span class="st">&#39;SUBJECT&#39;</span>,<span class="at">time=</span><span class="st">&#39;COURSE_NUM&#39;</span>,<span class="at">name_shape=</span><span class="st">&#39;EVENT&#39;</span>,<span class="at">name_col=</span><span class="st">&#39;EVENT&#39;</span>,<span class="at">fill=</span><span class="st">&#39;white&#39;</span>,<span class="at">size=</span><span class="fu">c</span>(<span class="fl">1.25</span>, <span class="dv">3</span>)[<span class="fu">as.factor</span>(ae<span class="sc">$</span>EVENT)])<span class="sc">+</span></span>
+<span id="cb38-11"><a href="swimplot.html#cb38-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">swimmer_arrows</span>(<span class="at">df_arrows=</span>res,<span class="at">id=</span><span class="st">&#39;SUBJECT&#39;</span>,<span class="at">arrow_start=</span><span class="st">&#39;RESPONSE_END&#39;</span>,<span class="at">cont=</span><span class="st">&#39;CONTINUED_RESPONSE&#39;</span>,<span class="at">name_col=</span><span class="st">&#39;RESPONSE&#39;</span>,<span class="at">show.legend=</span><span class="cn">FALSE</span>,<span class="at">type=</span><span class="st">&quot;open&quot;</span>,<span class="at">cex=</span><span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb38-12"><a href="swimplot.html#cb38-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values=</span><span class="fu">c</span>(<span class="st">&#39;grey60&#39;</span>, <span class="st">&#39;grey90&#39;</span>))<span class="sc">+</span></span>
+<span id="cb38-13"><a href="swimplot.html#cb38-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">name=</span><span class="st">&#39;RESPONSE&#39;</span>,<span class="at">values=</span><span class="fu">c</span>(<span class="st">&#39;PD&#39;</span><span class="ot">=</span><span class="st">&#39;red&#39;</span>, <span class="st">&#39;SD&#39;</span><span class="ot">=</span><span class="st">&#39;magenta1&#39;</span>, <span class="st">&#39;NE&#39;</span><span class="ot">=</span><span class="st">&#39;gold&#39;</span>, <span class="st">&#39;PR&#39;</span><span class="ot">=</span><span class="st">&#39;chartreuse2&#39;</span>, <span class="st">&#39;CR&#39;</span><span class="ot">=</span><span class="st">&#39;turquoise2&#39;</span>, <span class="st">&#39;AE&#39;</span><span class="ot">=</span><span class="st">&#39;red&#39;</span>, <span class="st">&#39;SAE&#39;</span><span class="ot">=</span><span class="st">&#39;black&#39;</span>), <span class="at">breaks =</span> <span class="fu">c</span>(<span class="st">&#39;PD&#39;</span>, <span class="st">&#39;SD&#39;</span>, <span class="st">&#39;NE&#39;</span>, <span class="st">&#39;PR&#39;</span>, <span class="st">&#39;CR&#39;</span>))  <span class="sc">+</span></span>
+<span id="cb38-14"><a href="swimplot.html#cb38-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_shape_manual</span>(<span class="at">values=</span><span class="fu">c</span>(<span class="dv">21</span>, <span class="dv">8</span>))<span class="sc">+</span></span>
+<span id="cb38-15"><a href="swimplot.html#cb38-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">&quot;COURSE CYCLE&quot;</span>) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">&quot;SUBJECT&quot;</span>)<span class="sc">+</span></span>
+<span id="cb38-16"><a href="swimplot.html#cb38-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">minor_breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="fu">max</span>(arm<span class="sc">$</span>END_TRT), <span class="at">by=</span><span class="dv">2</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="fu">max</span>(arm<span class="sc">$</span>END_TRT), <span class="at">by=</span><span class="dv">4</span>))<span class="sc">+</span></span>
+<span id="cb38-17"><a href="swimplot.html#cb38-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.minor =</span> <span class="fu">element_line</span>(<span class="at">colour=</span><span class="st">&quot;grey95&quot;</span>, <span class="at">size=</span><span class="fl">0.5</span>))<span class="sc">+</span></span>
+<span id="cb38-18"><a href="swimplot.html#cb38-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">shape =</span> <span class="fu">guide_legend</span>(<span class="at">override.aes =</span> <span class="fu">list</span>(<span class="at">col=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>))),<span class="at">color=</span><span class="fu">guide_legend</span>(<span class="at">override.aes =</span> <span class="fu">list</span>(<span class="at">shape=</span><span class="cn">NA</span>)));</span>
+<span id="cb38-19"><a href="swimplot.html#cb38-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-20"><a href="swimplot.html#cb38-20" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="fu">paste</span>(<span class="st">&quot;man/figures/clin_trial_SEX_AGE&quot;</span>, <span class="st">&quot;.png&quot;</span>, <span class="at">sep=</span><span class="st">&quot;&quot;</span>), p, <span class="at">width=</span><span class="fl">6.4</span>, <span class="at">height=</span><span class="fl">6.4</span>, <span class="at">device=</span><span class="st">&quot;png&quot;</span>, <span class="at">scale=</span><span class="dv">1</span>);</span></code></pre></div>
+<p><img src="man/figures/clin_trial_SEX_AGE.png" width="100%" /></p>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="when-there-are-multiple-column-per-event-type.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": false,
+"twitter": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": false
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": null,
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "none",
+"toc_depth": 3,
+"scroll_highlight": true
+},
+"info": false
+});
+});
+</script>
+
+</body>
+
+</html>

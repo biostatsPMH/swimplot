@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>6 When there are multiple column per event type | Creating swimmer plots with ease</title>
+  <meta name="description" content="6 When there are multiple column per event type | Creating swimmer plots with ease" />
+  <meta name="generator" content="bookdown 0.36 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="6 When there are multiple column per event type | Creating swimmer plots with ease" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="6 When there are multiple column per event type | Creating swimmer plots with ease" />
+  
+  
+  
+
+<meta name="author" content="Jessica Weiss" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="when-there-is-one-column-per-event-type.html"/>
+<link rel="next" href="swimplot.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li> &nbsp;&nbsp; BiostatsUHNplus    </li>
+<li> &nbsp;&nbsp; PMH Biostatistics</li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction to swimmers plots</a></li>
+<li class="chapter" data-level="2" data-path="a-working-example.html"><a href="a-working-example.html"><i class="fa fa-check"></i><b>2</b> A working example</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="a-working-example.html"><a href="a-working-example.html#the-data-and-research-question"><i class="fa fa-check"></i><b>2.1</b> The Data and research question</a></li>
+<li class="chapter" data-level="2.2" data-path="a-working-example.html"><a href="a-working-example.html#basic-plot"><i class="fa fa-check"></i><b>2.2</b> Basic plot</a></li>
+<li class="chapter" data-level="2.3" data-path="a-working-example.html"><a href="a-working-example.html#modifying-the-order-and-colours-of-the-bars"><i class="fa fa-check"></i><b>2.3</b> Modifying the order and colours of the bars</a></li>
+<li class="chapter" data-level="2.4" data-path="a-working-example.html"><a href="a-working-example.html#stratification"><i class="fa fa-check"></i><b>2.4</b> Stratification</a></li>
+<li class="chapter" data-level="2.5" data-path="a-working-example.html"><a href="a-working-example.html#adding-points"><i class="fa fa-check"></i><b>2.5</b> Adding points</a></li>
+<li class="chapter" data-level="2.6" data-path="a-working-example.html"><a href="a-working-example.html#adding-lines"><i class="fa fa-check"></i><b>2.6</b> Adding lines</a></li>
+<li class="chapter" data-level="2.7" data-path="a-working-example.html"><a href="a-working-example.html#adding-lines-and-points-together"><i class="fa fa-check"></i><b>2.7</b> Adding lines and points together</a></li>
+<li class="chapter" data-level="2.8" data-path="a-working-example.html"><a href="a-working-example.html#adding-arrows"><i class="fa fa-check"></i><b>2.8</b> Adding arrows</a></li>
+<li class="chapter" data-level="2.9" data-path="a-working-example.html"><a href="a-working-example.html#making-the-plots-more-aesthetically-pleasing-with-ggplot-manipulations"><i class="fa fa-check"></i><b>2.9</b> Making the plots more aesthetically pleasing with ggplot manipulations</a>
+<ul>
+<li class="chapter" data-level="2.9.1" data-path="a-working-example.html"><a href="a-working-example.html#modifying-colours-and-shapes"><i class="fa fa-check"></i><b>2.9.1</b> Modifying Colours and shapes</a></li>
+<li class="chapter" data-level="2.9.2" data-path="a-working-example.html"><a href="a-working-example.html#legends"><i class="fa fa-check"></i><b>2.9.2</b> Legends</a></li>
+<li class="chapter" data-level="2.9.3" data-path="a-working-example.html"><a href="a-working-example.html#add-arrows-to-the-legend"><i class="fa fa-check"></i><b>2.9.3</b> Add arrows to the legend</a></li>
+<li class="chapter" data-level="2.9.4" data-path="a-working-example.html"><a href="a-working-example.html#axis"><i class="fa fa-check"></i><b>2.9.4</b> axis</a></li>
+<li class="chapter" data-level="2.9.5" data-path="a-working-example.html"><a href="a-working-example.html#formatting-the-legend-when-an-aesthetic-is-mapped-in-multiple-layers"><i class="fa fa-check"></i><b>2.9.5</b> Formatting the legend when an aesthetic is mapped in multiple layers</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="more-complex-data-structures.html"><a href="more-complex-data-structures.html"><i class="fa fa-check"></i><b>3</b> More complex data structures</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="more-complex-data-structures.html"><a href="more-complex-data-structures.html#gaps-between-sections-in-a-single-bar"><i class="fa fa-check"></i><b>3.1</b> Gaps between sections in a single bar</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="formatting-data.html"><a href="formatting-data.html"><i class="fa fa-check"></i><b>4</b> Formatting data</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="formatting-data.html"><a href="formatting-data.html#long-data"><i class="fa fa-check"></i><b>4.1</b> Long data</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="when-there-is-one-column-per-event-type.html"><a href="when-there-is-one-column-per-event-type.html"><i class="fa fa-check"></i><b>5</b> When there is one column per event type</a></li>
+<li class="chapter" data-level="6" data-path="when-there-are-multiple-column-per-event-type.html"><a href="when-there-are-multiple-column-per-event-type.html"><i class="fa fa-check"></i><b>6</b> When there are multiple column per event type</a></li>
+<li class="chapter" data-level="7" data-path="swimplot.html"><a href="swimplot.html"><i class="fa fa-check"></i><b>7</b> swimplot</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="swimplot.html"><a href="swimplot.html#installation"><i class="fa fa-check"></i><b>7.1</b> Installation</a></li>
+<li class="chapter" data-level="7.2" data-path="swimplot.html"><a href="swimplot.html#documentation"><i class="fa fa-check"></i><b>7.2</b> Documentation</a></li>
+<li class="chapter" data-level="7.3" data-path="swimplot.html"><a href="swimplot.html#examples"><i class="fa fa-check"></i><b>7.3</b> Examples</a>
+<ul>
+<li class="chapter" data-level="7.3.1" data-path="swimplot.html"><a href="swimplot.html#swimmer-plot-that-includes-ae-event-status-by-course-cycle"><i class="fa fa-check"></i><b>7.3.1</b> Swimmer plot that includes AE event status by course cycle</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Creating swimmer plots with ease</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="when-there-are-multiple-column-per-event-type" class="section level1 hasAnchor" number="6">
+<h1><span class="header-section-number">6</span> When there are multiple column per event type<a href="when-there-are-multiple-column-per-event-type.html#when-there-are-multiple-column-per-event-type" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>When there are separate columns for the data, and event type it is more complex. In this data the response start, end, and response types are all stored in different columns, but must be kept together per patient and event.</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="when-there-are-multiple-column-per-event-type.html#cb32-1" aria-hidden="true" tabindex="-1"></a>long_start <span class="ot">&lt;-</span> <span class="fu">gather_</span>(<span class="at">data=</span>wide_example[,<span class="fu">c</span>(<span class="st">&#39;ID&#39;</span>,<span class="st">&#39;Response1.Start&#39;</span>,<span class="st">&#39;Response2.Start&#39;</span>,<span class="st">&#39;Response3.Start&#39;</span>)],</span>
+<span id="cb32-2"><a href="when-there-are-multiple-column-per-event-type.html#cb32-2" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;response_number&quot;</span>, <span class="st">&quot;start_time&quot;</span>, <span class="at">gather_cols=</span><span class="fu">c</span>(<span class="st">&#39;Response1.Start&#39;</span>,<span class="st">&#39;Response2.Start&#39;</span>,</span>
+<span id="cb32-3"><a href="when-there-are-multiple-column-per-event-type.html#cb32-3" aria-hidden="true" tabindex="-1"></a>                                                                <span class="st">&#39;Response3.Start&#39;</span>),<span class="at">na.rm=</span>T)</span>
+<span id="cb32-4"><a href="when-there-are-multiple-column-per-event-type.html#cb32-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-5"><a href="when-there-are-multiple-column-per-event-type.html#cb32-5" aria-hidden="true" tabindex="-1"></a>long_start<span class="sc">$</span>response_number <span class="ot">&lt;-</span> <span class="fu">substring</span>(long_start<span class="sc">$</span>response_number,<span class="dv">1</span>,<span class="dv">9</span>) <span class="co"># Will be used to match to the end and types</span></span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="center">ID</th>
+<th align="center">response_number</th>
+<th align="center">start_time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">ID:001</td>
+<td align="center">Response1</td>
+<td align="center">1.2</td>
+</tr>
+<tr class="even">
+<td align="center">ID:002</td>
+<td align="center">Response1</td>
+<td align="center">0.6</td>
+</tr>
+<tr class="odd">
+<td align="center">ID:001</td>
+<td align="center">Response2</td>
+<td align="center">4.0</td>
+</tr>
+<tr class="even">
+<td align="center">ID:002</td>
+<td align="center">Response2</td>
+<td align="center">1.5</td>
+</tr>
+<tr class="odd">
+<td align="center">ID:002</td>
+<td align="center">Response3</td>
+<td align="center">2.0</td>
+</tr>
+</tbody>
+</table>
+<p>Separate dataframes are created for the end time, and response, then they are all merged together by the id, and response_number</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="when-there-are-multiple-column-per-event-type.html#cb33-1" aria-hidden="true" tabindex="-1"></a>long_end <span class="ot">&lt;-</span> <span class="fu">gather_</span>(<span class="at">data=</span>wide_example[,<span class="fu">c</span>(<span class="st">&#39;ID&#39;</span>,<span class="st">&#39;Response1.End&#39;</span>,<span class="st">&#39;Response2.End&#39;</span>,<span class="st">&#39;Response3.End&#39;</span>)],</span>
+<span id="cb33-2"><a href="when-there-are-multiple-column-per-event-type.html#cb33-2" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;response_number&quot;</span>, <span class="st">&quot;end_time&quot;</span>, <span class="at">gather_cols=</span><span class="fu">c</span>(<span class="st">&#39;Response1.End&#39;</span>,<span class="st">&#39;Response2.End&#39;</span>,</span>
+<span id="cb33-3"><a href="when-there-are-multiple-column-per-event-type.html#cb33-3" aria-hidden="true" tabindex="-1"></a>                                                            <span class="st">&#39;Response3.End&#39;</span>),<span class="at">na.rm=</span>T)</span>
+<span id="cb33-4"><a href="when-there-are-multiple-column-per-event-type.html#cb33-4" aria-hidden="true" tabindex="-1"></a>long_end<span class="sc">$</span>response_number <span class="ot">&lt;-</span> <span class="fu">substring</span>(long_end<span class="sc">$</span>response_number,<span class="dv">1</span>,<span class="dv">9</span>)</span>
+<span id="cb33-5"><a href="when-there-are-multiple-column-per-event-type.html#cb33-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-6"><a href="when-there-are-multiple-column-per-event-type.html#cb33-6" aria-hidden="true" tabindex="-1"></a>long_response <span class="ot">&lt;-</span> <span class="fu">gather_</span>(<span class="at">data=</span>wide_example[,<span class="fu">c</span>(<span class="st">&#39;ID&#39;</span>,<span class="st">&#39;Response1&#39;</span>,<span class="st">&#39;Response2&#39;</span>,<span class="st">&#39;Response3&#39;</span>)],</span>
+<span id="cb33-7"><a href="when-there-are-multiple-column-per-event-type.html#cb33-7" aria-hidden="true" tabindex="-1"></a>                         <span class="st">&quot;response_number&quot;</span>, <span class="st">&quot;Response&quot;</span>, <span class="at">gather_cols=</span><span class="fu">c</span>(<span class="st">&#39;Response1&#39;</span>,<span class="st">&#39;Response2&#39;</span>,<span class="st">&#39;Response3&#39;</span>),</span>
+<span id="cb33-8"><a href="when-there-are-multiple-column-per-event-type.html#cb33-8" aria-hidden="true" tabindex="-1"></a>                         <span class="at">na.rm=</span>T)</span>
+<span id="cb33-9"><a href="when-there-are-multiple-column-per-event-type.html#cb33-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-10"><a href="when-there-are-multiple-column-per-event-type.html#cb33-10" aria-hidden="true" tabindex="-1"></a>long_response_full <span class="ot">&lt;-</span> <span class="fu">Reduce</span>(<span class="cf">function</span>(...) <span class="fu">merge</span>(..., <span class="at">all=</span><span class="cn">TRUE</span>,<span class="at">by=</span><span class="fu">c</span>(<span class="st">&#39;ID&#39;</span>,<span class="st">&#39;response_number&#39;</span>)), </span>
+<span id="cb33-11"><a href="when-there-are-multiple-column-per-event-type.html#cb33-11" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">list</span>(long_start, long_end, long_response))</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="center">ID</th>
+<th align="center">response_number</th>
+<th align="center">start_time</th>
+<th align="center">end_time</th>
+<th align="center">Response</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">ID:001</td>
+<td align="center">Response1</td>
+<td align="center">1.2</td>
+<td align="center">2.2</td>
+<td align="center">SD</td>
+</tr>
+<tr class="even">
+<td align="center">ID:001</td>
+<td align="center">Response2</td>
+<td align="center">4.0</td>
+<td align="center">5.0</td>
+<td align="center">CR</td>
+</tr>
+<tr class="odd">
+<td align="center">ID:002</td>
+<td align="center">Response1</td>
+<td align="center">0.6</td>
+<td align="center">0.8</td>
+<td align="center">SD</td>
+</tr>
+<tr class="even">
+<td align="center">ID:002</td>
+<td align="center">Response2</td>
+<td align="center">1.5</td>
+<td align="center">2.0</td>
+<td align="center">PR</td>
+</tr>
+<tr class="odd">
+<td align="center">ID:002</td>
+<td align="center">Response3</td>
+<td align="center">2.0</td>
+<td align="center">4.0</td>
+<td align="center">CR</td>
+</tr>
+</tbody>
+</table>
+<p>The lines can then be added to the plot</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="when-there-are-multiple-column-per-event-type.html#cb34-1" aria-hidden="true" tabindex="-1"></a>plot<span class="sc">+</span> </span>
+<span id="cb34-2"><a href="when-there-are-multiple-column-per-event-type.html#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">swimmer_points</span>(<span class="at">df=</span>points_long,<span class="at">id=</span><span class="st">&#39;ID&#39;</span>,<span class="at">name_shape =</span> <span class="st">&#39;point&#39;</span>,<span class="at">size=</span><span class="dv">8</span>)<span class="sc">+</span></span>
+<span id="cb34-3"><a href="when-there-are-multiple-column-per-event-type.html#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">swimmer_lines</span>(<span class="at">df_lines =</span> long_response_full,<span class="at">id=</span><span class="st">&#39;ID&#39;</span>,<span class="at">start =</span> <span class="st">&#39;start_time&#39;</span>,<span class="at">end=</span><span class="st">&#39;end_time&#39;</span>,</span>
+<span id="cb34-4"><a href="when-there-are-multiple-column-per-event-type.html#cb34-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">name_col=</span><span class="st">&#39;Response&#39;</span>,<span class="at">size=</span><span class="dv">25</span>)</span></code></pre></div>
+<p><img src="man/figures/unnamed-chunk-27-1.png" width="768" /></p>
+
+<!-- This file is used to create README.md
+Note that the README.md document may need updating to change
+'\<0.001' to '<0.001'. 
+-->
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="when-there-is-one-column-per-event-type.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="swimplot.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": false,
+"twitter": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": false
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": null,
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "none",
+"toc_depth": 3,
+"scroll_highlight": true
+},
+"info": false
+});
+});
+</script>
+
+</body>
+
+</html>

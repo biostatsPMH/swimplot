@@ -43,9 +43,9 @@ An alternative version of **swimplot** which allows for patterns in the bars (eg
 devtools::install_github("biostatsPMH/swimplot", ref="pattern")
 ```
 
-<!-- ## Documentation -->
+## Documentation
 
-<!-- [Online Documentation](https://biostatsPMH.github.io/swimplot/) -->
+[Online Documentation](https://biostatsPMH.github.io/swimplot/)
 
 ## Examples
 
