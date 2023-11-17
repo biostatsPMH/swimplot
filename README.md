@@ -31,8 +31,9 @@ with:
 devtools::install_github("biostatsPMH/swimplot", ref="pattern")
 ```
 
-<!-- ## Documentation -->
-<!-- [Online Documentation](https://biostatsPMH.github.io/swimplot/) -->
+## Documentation
+
+[Online Documentation](https://biostatsPMH.github.io/swimplot/)
 
 ## Examples
 
