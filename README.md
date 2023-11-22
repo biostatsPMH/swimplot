@@ -47,7 +47,7 @@ devtools::install_github("biostatsPMH/swimplot", ref="pattern")
 
 ### Swimmer plot that includes AE event status by course cycle
 
-Uses addendum fake study data. The below swimmer plot stratifies by sex,
+Uses addendum simulated study data. The below swimmer plot stratifies by sex,
 but all participants are female.
 
 The *width*, *height* and *scale* parameters in ggsave() can be modified
