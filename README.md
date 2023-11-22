@@ -6,6 +6,17 @@ Note that the README.md document may need updating to change
 
 # swimplot
 
+<!-- badges: start -->
+
+[![Lifecycle:
+Stable](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/exceldata)](https://CRAN.R-project.org/package=swimplot)
+[![metacran
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/exceldata)](https://cran.r-project.org/package=swimplot)
+
+<!-- badges: end -->
+
 Swimmer plots are used to show a patient’s response over time
 (i.e. days), or by treatment course cycle.
 
