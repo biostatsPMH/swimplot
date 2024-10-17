@@ -71,22 +71,28 @@ invertedIntervals <- function(dt, intersection, id, start, end){
   if (class(dt[,end]) != class(dt[,start])) stop("Start and end dates/times must be the same object class.")
   boundaries <- c(min(c(dt[,start], dt[,end]), na.rm=T)-1, max(c(dt[,start], dt[,end]))+1)
   
+  if (nrow(intersection) > 0){
   # get first inverted interval:
   tmp_first <- intersection[,c(id, start)] |> dplyr::filter(!duplicated(!!dplyr::sym(id))) 
   names(tmp_first)[names(tmp_first) == start] <- end
   tmp_first[,start] <- -Inf
   
   # get all inverted intervals after the first one:
+  first_id <- intersection[1,id]
   tmp_subsequent <- intersection[,c(id, start, end)] |> 
     tidyr::pivot_longer(2:3, values_to="date") |> 
     dplyr::mutate(date_lead = ifelse(
-      dplyr::lead(!!dplyr::sym(id), default=dt[1,id]) == !!dplyr::sym(id), 
-      dplyr::lead(date), Inf)) |> 
+      dplyr::lead(!!dplyr::sym(id), default=first_id) == !!dplyr::sym(id), 
+      dplyr::lead(date, default=Inf), Inf)) |> 
     dplyr::filter(name == end) |> 
     dplyr::select(!name)
   
   names(tmp_subsequent)[names(tmp_subsequent) == "date"] <- start
   names(tmp_subsequent)[names(tmp_subsequent) == "date_lead"] <- end
+  } else {
+    tmp_first <- NULL
+    tmp_subsequent <- NULL
+  }
   
   # get inverted intervals for patients with no overlap (the whole set space):
   tmp_no_overlap <- data.frame(unique(dt[!dt[,id] %in% intersection[,id],id]), -Inf, Inf)
@@ -106,20 +112,20 @@ invertedIntervals <- function(dt, intersection, id, start, end){
 # treatments by finding overlap between two treatments at a time, and looping
 # through all possible treatments.
 
-transform_for_swimplot <- function (data, id, Tx, start, end){
+transform_for_swimplot <- function (df, id, Tx, start, end){
   # Find overlapping intervals for each patient:
-  intersect_dat <- getIntersection(dt1=data, id=id, Tx=Tx, start=start, end=end)
+  intersect_dat <- getIntersection(dt1=df, id=id, Tx=Tx, start=start, end=end)
   
   # Getting inverted intervals (complement of the set of overlapping intervals):
-  inverted_dat <- invertedIntervals(intersection=intersect_dat, dt=data, id=id, start=start, end=end)
+  inverted_dat <- invertedIntervals(intersection=intersect_dat, dt=df, id=id, start=start, end=end)
   
   # recycling getIntersection function above, but this time passing in both the
   # original data and the inverted intervals:
   non_intersect_dat <- getIntersection(
-    dt1=data, dt2=inverted_dat, id=id, Tx=Tx, start=start, end=end)
+    dt1=df, dt2=inverted_dat, id=id, Tx=Tx, start=start, end=end)
   names(non_intersect_dat)[names(non_intersect_dat) == Tx] <- paste0(Tx, "_1")
   
   # Putting intersection and non-intersection together:
   dplyr::bind_rows(intersect_dat, non_intersect_dat) |> 
-    dplyr::arrange(patient_id, !!dplyr::sym(start), !!dplyr::sym(end))
+    dplyr::arrange(!!dplyr::sym(id), !!dplyr::sym(start), !!dplyr::sym(end))
 }

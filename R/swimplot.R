@@ -77,7 +77,8 @@
 #'
 #'
 #' @export
-swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_col=NULL,name_alpha=NULL,
+swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
+                         name_col=NULL,name_alpha=NULL,barwidth=0.8,
                          increasing=TRUE,id_order = NULL,
                          stratify=NULL,base_size=11,identifiers=TRUE,...)
 {
@@ -204,124 +205,81 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,name_
   if(start %in% names(df)){
 
     ###ADDING A FILL COLUMN IF THERE IS NOT ONE SO THE SPACES ARE BLANK
-    if(is.null(name_fill) & !all(df[,start]==1) ){
+    if(is.null(name_fill)){
       name_fill <- "Colour_for_spaces"
       df[,name_fill] <- "fill"
-
     }
-
 
     ##Checking there are not overlapping sections
-    check_for_overlap <- function(data,id,start,end,x){
-      single <- data[data[,id]==x,]
-      if(dim(single)[1]>1){
-        single <- single[order(single[,start]),]
-        check_val <- min(single[,start]-dplyr::lag(single[,end]),na.rm = T)
-        if(check_val<0) return(x)
-      }
-    }
-
-
-    overlap <- unlist(sapply(unique(df[,id]), check_for_overlap,start=start,end=end,data=df,id=id))
-
-
-    if(length(overlap)>0) {stop(paste0(    paste0("There is(are) ", length(overlap)," id(s) with overlap between bars, they are ",id ,"=(",paste (overlap,sep="", collapse=","),")")))}
-
-    add_in <- function(id_fix,df,start,end){
-      df_fix <- df[df[,id]==id_fix,]
-
-      ##Filling in space up to 0
-      if(max(df_fix[,end])<0){
-
-
-        if(!is.null(stratify)){
-          df_fixed <- data.frame(id_fix,max(df_fix[,end]),0,df_fix[,stratify])
-          names(df_fixed) <- c(id,start,end,stratify)
-        }else{
-          df_fixed <- data.frame(id_fix,max(df_fix[,end]),0)
-          names(df_fixed) <- c(id,start,end)
+    if (!is.null(name_fill)){
+      overlap <- getIntersection(df, id=id, start=start, end=end, Tx=name_fill)
+      if(nrow(overlap)>0) {
+        warning(paste0(paste0("There is(are) ", length(unique(overlap[,id]))," id(s) with overlap between bars, they are ",id,"=(",paste (overlap[,id],sep="", collapse=","),")")))
+        if (!is.null(name_col) | !is.null(name_alpha)) {
+          warning("name_col and name_alpha arguments not currently supported for datasets with overlapping treatments.")
+          name_alpha <- NULL
+          name_col <- NULL
         }
-
-
-        df_fix <- merge(df_fixed,df_fix,all=T)
+        df <- transform_for_swimplot(df, id=id, start=start, end=end, Tx=name_fill)
       }
-
-      #Starting bar at 0
-      start_time_pat <- 0
-
-
-      #If the bar starts before 0 that is okay too
-      if(min(df_fix[,start])<0) start_time_pat <- min(df_fix[,start])
-
-      #Looking the start times which do not meet the last end time these will be the end times of the filler sections
-      end_blank <- df_fix[,start][c(start_time_pat,dplyr::lag(df_fix[,end])[-1]) != df_fix[,start]]
-
-      if(length(end_blank)==0) return(df_fix) # IF no filler done
-
-      ##start times of the filler are the previous end time
-      start_blank <- c(start_time_pat,dplyr::lag(df_fix[,end])[-1])[c(start_time_pat,dplyr::lag(df_fix[,end])[-1]) != df_fix[,start]]
-
-      if(!is.null(stratify)){
-        df_fixed <- data.frame(id_fix,start_blank,end_blank,df_fix[,stratify])
-        names(df_fixed) <- c(id,start,end,stratify)
-      }else{
-        df_fixed <- data.frame(id_fix,start_blank,end_blank)
-        names(df_fixed) <- c(id,start,end)
-
-      }
-
-
-      return(merge(df_fixed,df_fix,all=T))
     }
-    df <- do.call(rbind.data.frame,sapply(unique(df[,id]), add_in,df=df,start=start,end=end,simplify = F))
-
-    ##Fixing sections that cross 0
-    cross_zero <- function(i,df=df,start,end){
-      df_fix <- df[i,]
-
-      if(df_fix[,start]<0 & df_fix[,end]>0){
-        df_fix <- rbind(df_fix,df_fix)
-        df_fix[1,end] <- 0
-        df_fix[2,start] <- 0
-      }
-      return(df_fix)
-    }
-
-    df <- do.call(rbind.data.frame,sapply(seq_along(df[,start]), cross_zero,df=df,start=start,end=end,simplify = F))
-
-
-  }else {
+    
+  } else {
     start = 'starting_bars_variable'
     df$starting_bars_variable <- stats::ave(df[,end], df[,id], FUN=dplyr::lag)
     df$starting_bars_variable[is.na(df$starting_bars_variable)] <- 0
   }
 
-  #Calculating the length of the bar for that section
-  temp_end <- df[,end] - as.numeric(as.character(df[,start]))
-
-  #Sections that are negative have to have a negative length
-  temp_end[as.numeric(as.character(df[,start]))<0] <- 0 - temp_end[as.numeric(as.character(df[,start]))<0]
-
-
-  #This column is the length of the bar section. The end column name is used so the x axis has the correct label
-  df[,end] <- temp_end
-
+  # #Calculating the length of the bar for that section
+  # temp_end <- df[,end] - as.numeric(as.character(df[,start]))
+  # 
+  # #Sections that are negative have to have a negative length
+  # temp_end[as.numeric(as.character(df[,start]))<0] <- 0 - temp_end[as.numeric(as.character(df[,start]))<0]
+  # 
+  # #This column is the length of the bar section. The end column name is used so the x axis has the correct label
+  # df[,end] <- temp_end
 
   df <- data.frame(df)
 
-  starting_times <- sort(unique(df[,start]),decreasing = TRUE)
+  # starting_times <- sort(unique(df[,start]),decreasing = TRUE)
+  # 
+  # ##Negative times need to be in backwards order to stack properly
+  # starting_times[starting_times<0] <- rev(starting_times[starting_times<0])
 
-  ##Negative times need to be in backwards order to stack properly
-  starting_times[starting_times<0] <- rev(starting_times[starting_times<0])
-
-
-  df[,start] <- factor(df[,start],starting_times)
-  df[, id] <- factor(df[, id], levels = id_order)
-
+  # df[,start] <- factor(df[,start],starting_times)
+  # df[, id] <- factor(df[, id], levels = id_order)
+  
+  # using ggplot2::geom_rect to create the bars. Need to specify xmin and xmax:
+  df[,id] <- factor(df[,id], levels=id_order)
+  df$xmin <- as.numeric(df[,id]) - barwidth/2
+  df$xmax <- as.numeric(df[,id]) + barwidth/2
+  
+  if (!is.null(overlap) & nrow(overlap) > 0){
+    fill_names_tmp <- paste0(name_fill, c("_1","_2"))
+    
+    # add transformation here so if overlap exists, each bar is half width
+    overlap <- data.frame(tidyr::pivot_longer(
+      df[!is.na(df[,fill_names_tmp[2]]),,drop=F], 
+      cols=all_of(fill_names_tmp), names_to="Xoverlap_name_fillX", 
+      values_to=name_fill, values_drop_na=T))
+    xminmax_modifier <- (as.numeric(factor(overlap$Xoverlap_name_fillX)) - 1.5)*barwidth/2
+    overlap$xmin <- as.numeric(overlap[,id]) - barwidth/4 + xminmax_modifier
+    overlap$xmax <- as.numeric(overlap[,id]) + barwidth/4 + xminmax_modifier
+    overlap <- overlap[,!names(overlap) %in% "Xoverlap_name_fillX", drop=F]
+    
+    nonoverlap <- df[is.na(df[,fill_names_tmp[2]]),
+                     !names(df) %in% c(fill_names_tmp[2]), drop=F]
+    names(nonoverlap)[names(nonoverlap) == fill_names_tmp[1]] <- name_fill
+    
+    df <- dplyr::bind_rows(overlap, nonoverlap)
+  }
+  
   plot <-
     ggplot2::ggplot(df) +
-    ggplot2::geom_col(position = "stack",
-                      ggplot2::aes_string(fill = name_fill,col = name_col,alpha=name_alpha, group = start,x = id, y = end),...) + ggplot2::coord_flip() +
+    ggplot2::geom_rect(
+      ggplot2::aes_string(fill = name_fill, col = name_col, alpha=name_alpha, 
+                          xmin = "xmin", xmax = "xmax", ymin=start, ymax = end),...) +  
+    ggplot2::coord_flip() +
     ggplot2::theme_bw(base_size = base_size) +
     ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),panel.grid.major = ggplot2::element_blank())
 
