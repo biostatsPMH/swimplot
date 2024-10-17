@@ -14,7 +14,7 @@ swimmer_plot(
   name_alpha = NULL,
   increasing = TRUE,
   id_order = NULL,
-  stratify = FALSE,
+  stratify = NULL,
   base_size = 11,
   identifiers = TRUE,
   ...
