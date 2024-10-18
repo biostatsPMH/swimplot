@@ -54,7 +54,7 @@ getIntersection <- function(dt1, dt2=NULL, id, Tx, start, end){
   
   if (nrow(check_morethantwo) > 0) stop(
     "Dataset has three or more treatments overlapping in time. 
-    More than two overlapping treatments is not currently supported by this function.")
+    More than two overlapping treatments is not currently supported by swimplot.")
   
   return(tmp[,names(tmp) %in% c(id, start, end, Tx, Txxy)])
 }
