@@ -22,7 +22,7 @@
 #' @param stratify a list of column names to stratify by
 #' @param base_size the base size for the plot, default is 11
 #' @param identifiers Binary to specify patient identifiers are included in the y axis (default is TRUE)
-#' @param ... additional geom_col() arguments
+#' @param ... additional arguments passed to geom_rect() 
 #' @return a swimmer plot with bars
 #' @seealso \code{\link{swimmer_points}} \code{\link{swimmer_lines}}  \code{\link{swimmer_lines}}  \code{\link{swimmer_points_from_lines}} \code{\link{swimmer_arrows}} \code{\link{swimmer_text}}
 #' @examples
@@ -88,7 +88,6 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
                          starting_bar_alpha=1, stratify=NULL,
                          base_size=11,identifiers=TRUE,...)
 {
-
 
   if(!is.null(stratify))  {
     if(any(duplicated(unique(df[,c(id,stratify)])[,id]))){
@@ -169,7 +168,7 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
     }
   }
 
-
+  df <- data.frame(df)
   df[,id] <- as.character(df[,id])
 
   ##Putting in order by increasing or decreasing if a column name/ id order is not given
@@ -261,8 +260,8 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
   # Add rectangles underneath to indicate total length of follow-up?
   total_followup <- 
     dplyr::summarize(dplyr::group_by(df, !!dplyr::sym(id), xmin, xmax), 
-                     min_start = min(start, na.rm=T),
-                     max_end = max(end, na.rm=T), .groups="keep")
+                     min_start = min(!!dplyr::sym(start), na.rm=T),
+                     max_end = max(!!dplyr::sym(end), na.rm=T), .groups="keep")
   
   # add transformation here so if overlap exists, each bar is half width
   if (!is.null(overlap) && nrow(overlap) > 0){
@@ -310,8 +309,6 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
   return(plot)
 
 }
-
-
 
 
 # swimmer_points ------------------------------------------------------------
