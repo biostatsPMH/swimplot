@@ -13,7 +13,11 @@
 #' @param name_fill a column name to map the bar fill
 #' @param name_col a column name to map the bar colour
 #' @param name_alpha a column name to map the bar transparency
+#' @param barwidth width of each bar, or "lane" of the swimmer plot. By default set to 0.9 (90% of the distance between bars).
 #' @param id_order order of the bars by id, can input a column name to sort by, or the ids in order.
+#' @param starting_bar_fill fill colour for bar indicating the total length of follow-up (default is grey90)
+#' @param starting_bar_col outline colour for bar indicating the total length of follow-up (default is grey90)
+#' @param starting_bar_alpha transpanrency for bar indicating the total length of follow-up (default is opaque)
 #' @param increasing Binary to specify bars in increasing order (Default is TRUE)
 #' @param stratify a list of column names to stratify by
 #' @param base_size the base size for the plot, default is 11
@@ -78,9 +82,11 @@
 #'
 #' @export
 swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
-                         name_col=NULL,name_alpha=NULL,barwidth=0.8,
+                         name_col=NULL,name_alpha=NULL,barwidth=0.9,
                          increasing=TRUE,id_order = NULL,
-                         stratify=NULL,base_size=11,identifiers=TRUE,...)
+                         starting_bar_fill="grey90", starting_bar_col="grey90", 
+                         starting_bar_alpha=1, stratify=NULL,
+                         base_size=11,identifiers=TRUE,...)
 {
 
 
@@ -211,17 +217,15 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
     }
 
     ##Checking there are not overlapping sections
-    if (!is.null(name_fill)){
-      overlap <- getIntersection(df, id=id, start=start, end=end, Tx=name_fill)
-      if(nrow(overlap)>0) {
-        warning(paste0(paste0("There is(are) ", length(unique(overlap[,id]))," id(s) with overlap between bars, they are ",id,"=(",paste (overlap[,id],sep="", collapse=","),")")))
-        if (!is.null(name_col) | !is.null(name_alpha)) {
-          warning("name_col and name_alpha arguments not currently supported for datasets with overlapping treatments.")
-          name_alpha <- NULL
-          name_col <- NULL
-        }
-        df <- transform_for_swimplot(df, id=id, start=start, end=end, Tx=name_fill)
+    overlap <- getIntersection(df, id=id, start=start, end=end, Tx=name_fill)
+    if(nrow(overlap)>0) {
+      warning(paste0(paste0("There is(are) ", length(unique(overlap[,id]))," id(s) with overlap between bars, they are ",id,"=(",paste (overlap[,id],sep="", collapse=","),")")))
+      if (!is.null(name_col) | !is.null(name_alpha)) {
+        warning("name_col and name_alpha arguments not currently supported for datasets with overlapping treatments.")
+        name_alpha <- NULL
+        name_col <- NULL
       }
+      df <- transform_for_swimplot(df, id=id, start=start, end=end, Tx=name_fill)
     }
     
   } else {
@@ -254,10 +258,16 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
   df$xmin <- as.numeric(df[,id]) - barwidth/2
   df$xmax <- as.numeric(df[,id]) + barwidth/2
   
-  if (!is.null(overlap) & nrow(overlap) > 0){
+  # Add rectangles underneath to indicate total length of follow-up?
+  total_followup <- 
+    dplyr::summarize(dplyr::group_by(df, !!dplyr::sym(id), xmin, xmax), 
+                     min_start = min(start, na.rm=T),
+                     max_end = max(end, na.rm=T), .groups="keep")
+  
+  # add transformation here so if overlap exists, each bar is half width
+  if (!is.null(overlap) && nrow(overlap) > 0){
     fill_names_tmp <- paste0(name_fill, c("_1","_2"))
     
-    # add transformation here so if overlap exists, each bar is half width
     overlap <- data.frame(tidyr::pivot_longer(
       df[!is.na(df[,fill_names_tmp[2]]),,drop=F], 
       cols=all_of(fill_names_tmp), names_to="Xoverlap_name_fillX", 
@@ -275,13 +285,18 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
   }
   
   plot <-
-    ggplot2::ggplot(df) +
-    ggplot2::geom_rect(
+    ggplot2::ggplot() +
+    ggplot2::geom_rect(data=total_followup, mapping=ggplot2::aes(
+      xmin = xmin, xmax = xmax, ymin = min_start, ymax = max_end),
+      fill=starting_bar_fill, col=starting_bar_col, alpha=starting_bar_alpha) +
+    ggplot2::geom_rect(data=df, mapping= 
       ggplot2::aes_string(fill = name_fill, col = name_col, alpha=name_alpha, 
                           xmin = "xmin", xmax = "xmax", ymin=start, ymax = end),...) +  
+    ggplot2::scale_x_discrete(labels=id_order) +
     ggplot2::coord_flip() +
     ggplot2::theme_bw(base_size = base_size) +
-    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),panel.grid.major = ggplot2::element_blank())
+    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
+                   panel.grid.major = ggplot2::element_blank()) +
 
 
   if(!is.null(stratify)) plot <-  plot + ggplot2::facet_wrap(stats::as.formula(paste("~",paste(stratify,collapse = "+"))),scales = "free_y")+

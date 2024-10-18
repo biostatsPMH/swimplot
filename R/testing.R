@@ -86,7 +86,8 @@ swimmer_plot(df,name_fill='group2',stratify = 'group1')
 swimmer_plot(df,name_fill='group2',stratify = c('group1','group2'))
 
 # No changes all end negative ---------------------------------------------
-df <- data.frame(id=c(1,2,3,4,5),start=c(-5,-4,-3,-2,-1),end=c(-1,-1,-1,-1,-0.5),col=c(1,2,3,4,5),group1=c(5,5,5,10,10),group2=c('A',"B","B","A","C"))
+df <- data.frame(id=c(1,2,3,4,5),start=c(-5,-4,-3,-2,-1),end=c(-1,-1,-1,-1,-0.5),
+                 col=c(1,2,3,4,5),group1=c(5,5,5,10,10),group2=c('A',"B","B","A","C"))
 
 ##BASIC
 swimmer_plot(df)
@@ -142,15 +143,15 @@ swimmer_plot(df,name_fill='group2',stratify = c('group1','group2'))
 
 # No changes some positive some negative PLUS OVERLAP ----------------------------------
 
-df <- data.frame(id=c(1,1,2,3,4,5),
-                 start=c(-5,-4,-4,0,1,2),
-                 end=c(-1,-2,2,3,4,5),
-                 group1=c(5,5,5,5,10,10),
-                 group2=c('A',"B","B","B","A","C"))
+df <- data.frame(id=c(1,1,1,2,3,4,5),
+                 start=c(-5,-4,2,-4,0,1,2),
+                 end=c(-1,-2,3,2,3,4,5),
+                 group1=c(5,5,5,5,5,10,10),
+                 group2=c('A',"B","C","B","B","A","C"))
 
 ##BASIC
-swimmer_plot(df)+ggplot2::scale_fill_manual(name="Treatment",
-                                            values=c("#e41a1c",na.value=NA))+ ggplot2::theme(legend.position = "none")
+swimmer_plot(df) + ggplot2::scale_fill_manual(name="Treatment",
+                                            values=c("#e41a1c",na.value=NA)) + ggplot2::theme(legend.position = "none")
 ##FILL BY CONTINUOUS
 swimmer_plot(df,name_fill='group1')
 ##FILL BY CATEGORIC
