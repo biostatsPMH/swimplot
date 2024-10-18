@@ -17,7 +17,7 @@
 #' @param id_order order of the bars by id, can input a column name to sort by, or the ids in order.
 #' @param starting_bar_fill fill colour for bar indicating the total length of follow-up (default is grey90)
 #' @param starting_bar_col outline colour for bar indicating the total length of follow-up (default is grey90)
-#' @param starting_bar_alpha transpanrency for bar indicating the total length of follow-up (default is opaque)
+#' @param starting_bar_alpha transparency for bar indicating the total length of follow-up (default is opaque)
 #' @param increasing Binary to specify bars in increasing order (Default is TRUE)
 #' @param stratify a list of column names to stratify by
 #' @param base_size the base size for the plot, default is 11
@@ -488,8 +488,8 @@ swimmer_lines <- function(df_lines,id='id',start='start',end='end',adj.y=0,name_
 #'
 line_df_to_point_df <-function(df_lines,start = 'start',end = 'end',cont = NULL) {
 
-  df_points_lines <- tidyr::gather_(data=df_lines, key_col = "type",
-                             value_col = "x", gather_cols=c(start,end))
+  df_points_lines <- tidyr::gather(data=df_lines, key = "type",
+                                   value = "x", !!dplyr::sym(start), !!dplyr::sym(end))
 
   if(!is.null(cont)){
     df_points_lines <- df_points_lines[!(!is.na(df_points_lines[,cont]) & df_points_lines$type== end),]
