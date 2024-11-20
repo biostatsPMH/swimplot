@@ -95,8 +95,10 @@ invertedIntervals <- function(dt, intersection, id, start, end){
   }
   
   # get inverted intervals for patients with no overlap (the whole set space):
-  tmp_no_overlap <- data.frame(unique(dt[!dt[,id] %in% intersection[,id],id]), -Inf, Inf)
-  names(tmp_no_overlap) <- c(id, start, end)
+  if (sum(!dt[,id] %in% intersection[,id]) > 0){
+    tmp_no_overlap <- data.frame(unique(dt[!dt[,id] %in% intersection[,id],id]), -Inf, Inf)
+    names(tmp_no_overlap) <- c(id, start, end)
+  } else tmp_no_overlap <- NULL
   
   tmp <- data.frame(rbind(tmp_subsequent, tmp_first, tmp_no_overlap))
   tmp <- tmp[order(tmp[,id], tmp[,start]),]

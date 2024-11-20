@@ -12,8 +12,12 @@ swimmer_plot(
   name_fill = NULL,
   name_col = NULL,
   name_alpha = NULL,
+  barwidth = 0.9,
   increasing = TRUE,
   id_order = NULL,
+  starting_bar_fill = "grey90",
+  starting_bar_col = "grey90",
+  starting_bar_alpha = 1,
   stratify = NULL,
   base_size = 11,
   identifiers = TRUE,
@@ -35,9 +39,17 @@ swimmer_plot(
 
 \item{name_alpha}{a column name to map the bar transparency}
 
+\item{barwidth}{bar width, default is 0.9 (90% of distance between bars)}
+
 \item{increasing}{Binary to specify bars in increasing order (Default is TRUE)}
 
 \item{id_order}{order of the bars by id, can input a column name to sort by, or the ids in order.}
+
+\item{starting_bar_fill}{fill colour for bar indicating the total length of follow-up (default is grey90)}
+
+\item{starting_bar_col}{outline colour for bar indicating the total length of follow-up (default is grey90)}
+
+\item{starting_bar_alpha}{transparency for bar indicating the total length of follow-up (default is opaque)}
 
 \item{stratify}{a list of column names to stratify by}
 
@@ -45,7 +57,7 @@ swimmer_plot(
 
 \item{identifiers}{Binary to specify patient identifiers are included in the y axis (default is TRUE)}
 
-\item{...}{additional geom_col() arguments}
+\item{...}{additional arguments passed to geom_rect()}
 }
 \value{
 a swimmer plot with bars

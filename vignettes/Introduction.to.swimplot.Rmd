@@ -81,8 +81,9 @@ arm_plot
 Plots can be stratified by any variables in the dataframe
 
 ```{r, echo = TRUE,fig.align='centre'}
-swim_plot_stratify <-swimmer_plot(df=ClinicalTrial.Arm,id='id',end='End_trt',name_fill='Arm',
-col="black",alpha=0.75,width=.8,base_size = 14,stratify= c('Age','Sex'))
+swim_plot_stratify <-swimmer_plot(
+  df=ClinicalTrial.Arm, id='id', end='End_trt', name_fill='Arm', col="black",
+  alpha=0.75, width=.8, base_size = 14, stratify= c('Age','Sex'))
 
 swim_plot_stratify
 ```

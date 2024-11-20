@@ -13,12 +13,13 @@
 #' @param name_fill a column name to map the bar fill
 #' @param name_col a column name to map the bar colour
 #' @param name_alpha a column name to map the bar transparency
-#' @param barwidth width of each bar, or "lane" of the swimmer plot. By default set to 0.9 (90% of the distance between bars).
+#' @param width bar width, default is 0.9 (90% of distance between bars)
+#' @param increasing Binary to specify bars in increasing order (Default is TRUE)
 #' @param id_order order of the bars by id, can input a column name to sort by, or the ids in order.
+#' @param starting_bar_label label for bar indicating the total length of follow-up
 #' @param starting_bar_fill fill colour for bar indicating the total length of follow-up (default is grey90)
 #' @param starting_bar_col outline colour for bar indicating the total length of follow-up (default is grey90)
 #' @param starting_bar_alpha transparency for bar indicating the total length of follow-up (default is opaque)
-#' @param increasing Binary to specify bars in increasing order (Default is TRUE)
 #' @param stratify a list of column names to stratify by
 #' @param base_size the base size for the plot, default is 11
 #' @param identifiers Binary to specify patient identifiers are included in the y axis (default is TRUE)
@@ -82,11 +83,11 @@
 #'
 #' @export
 swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
-                         name_col=NULL,name_alpha=NULL,barwidth=0.9,
+                         name_col=NULL,name_alpha=NULL,width=0.9,
                          increasing=TRUE,id_order = NULL,
-                         starting_bar_fill="grey90", starting_bar_col="grey90", 
-                         starting_bar_alpha=1, stratify=NULL,
-                         base_size=11,identifiers=TRUE,...)
+                         starting_bar_label="Follow-up",starting_bar_fill="grey90", 
+                         starting_bar_col="grey90", starting_bar_alpha=1, 
+                         stratify=NULL,base_size=11,identifiers=TRUE,...)
 {
 
   if(!is.null(stratify))  {
@@ -206,6 +207,8 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
   df <- df[order(df[,id],df[,end]),]
 
   #If the start time is given a test for overlap is done
+  overlap <- NULL
+  
   #Sections are filled in where needed (Between bars, up to zero, before zero)
   if(start %in% names(df)){
 
@@ -242,8 +245,6 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
   # #This column is the length of the bar section. The end column name is used so the x axis has the correct label
   # df[,end] <- temp_end
 
-  df <- data.frame(df)
-
   # starting_times <- sort(unique(df[,start]),decreasing = TRUE)
   # 
   # ##Negative times need to be in backwards order to stack properly
@@ -254,14 +255,45 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
   
   # using ggplot2::geom_rect to create the bars. Need to specify xmin and xmax:
   df[,id] <- factor(df[,id], levels=id_order)
-  df$xmin <- as.numeric(df[,id]) - barwidth/2
-  df$xmax <- as.numeric(df[,id]) + barwidth/2
+  df$xmin <- as.numeric(df[,id]) - width/2
+  df$xmax <- as.numeric(df[,id]) + width/2
   
   # Add rectangles underneath to indicate total length of follow-up?
   total_followup <- 
     dplyr::summarize(dplyr::group_by(df, !!dplyr::sym(id), xmin, xmax), 
                      min_start = min(!!dplyr::sym(start), na.rm=T),
-                     max_end = max(!!dplyr::sym(end), na.rm=T), .groups="keep")
+                     max_end = max(!!dplyr::sym(end), na.rm=T), .groups="keep",
+                     Tx = "X_total_followup_time_X")
+  
+  names(total_followup)[names(total_followup) == "min_start"] <- start
+  names(total_followup)[names(total_followup) == "max_end"] <- end
+  names(total_followup)[names(total_followup) == "Tx"] <- name_fill
+  
+  total_followup <- data.frame(total_followup)
+  
+  # ~~~~~~~~~~~~ #
+  
+  # Take intersection of rows and total follow-up time:
+  intersect_dat <- getIntersection(
+    dt1=total_followup, dt2=df, id=id, Tx=name_fill, start=start, end=end)
+  
+  # Getting inverted intervals (complement of the set of overlapping intervals):
+  inverted_dat <- invertedIntervals(
+    intersection=intersect_dat, dt=df, id=id, start=start, end=end)
+  
+  # getting intersection of the original data and the inverted intervals to find
+  # the instances of follow-up with no associated filled interval:
+  followup_alone <- getIntersection(
+    dt1=df, dt2=inverted_dat, id=id, Tx=name_fill, start=start, end=end)
+  
+  if (nrow(followup_alone) > 0) {
+    followup_alone[,names(followup_alone) == name_fill] <- followup_label
+  }
+
+  # append to dataset:
+  # df <- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+  
+  # ~~~~~~~~~~~~ #
   
   # add transformation here so if overlap exists, each bar is half width
   if (!is.null(overlap) && nrow(overlap) > 0){
@@ -271,9 +303,9 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
       df[!is.na(df[,fill_names_tmp[2]]),,drop=F], 
       cols=all_of(fill_names_tmp), names_to="Xoverlap_name_fillX", 
       values_to=name_fill, values_drop_na=T))
-    xminmax_modifier <- (as.numeric(factor(overlap$Xoverlap_name_fillX)) - 1.5)*barwidth/2
-    overlap$xmin <- as.numeric(overlap[,id]) - barwidth/4 + xminmax_modifier
-    overlap$xmax <- as.numeric(overlap[,id]) + barwidth/4 + xminmax_modifier
+    xminmax_modifier <- (as.numeric(factor(overlap$Xoverlap_name_fillX)) - 1.5)*width/2
+    overlap$xmin <- as.numeric(overlap[,id]) - width/4 + xminmax_modifier
+    overlap$xmax <- as.numeric(overlap[,id]) + width/4 + xminmax_modifier
     overlap <- overlap[,!names(overlap) %in% "Xoverlap_name_fillX", drop=F]
     
     nonoverlap <- df[is.na(df[,fill_names_tmp[2]]),
@@ -295,11 +327,14 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
     ggplot2::coord_flip() +
     ggplot2::theme_bw(base_size = base_size) +
     ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
-                   panel.grid.major = ggplot2::element_blank()) +
+                   panel.grid.major = ggplot2::element_blank()) 
 
 
-  if(!is.null(stratify)) plot <-  plot + ggplot2::facet_wrap(stats::as.formula(paste("~",paste(stratify,collapse = "+"))),scales = "free_y")+
-    ggplot2::theme(strip.background = ggplot2::element_rect(colour="black", fill="white"))
+  if(!is.null(stratify)) {
+    plot <-  plot + 
+      ggplot2::facet_wrap(stats::as.formula(paste("~",paste(stratify,collapse = "+"))),scales = "free_y")+
+      ggplot2::theme(strip.background = ggplot2::element_rect(colour="black", fill="white"))
+  }
 
 
   if(identifiers==FALSE) plot <-  plot + ggplot2::theme(axis.title.y=ggplot2::element_blank(),
