@@ -280,18 +280,21 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
   # Getting inverted intervals (complement of the set of overlapping intervals):
   inverted_dat <- invertedIntervals(
     intersection=intersect_dat, dt=df, id=id, start=start, end=end)
-  
-  # getting intersection of the original data and the inverted intervals to find
-  # the instances of follow-up with no associated filled interval:
-  followup_alone <- getIntersection(
-    dt1=df, dt2=inverted_dat, id=id, Tx=name_fill, start=start, end=end)
-  
-  if (nrow(followup_alone) > 0) {
-    followup_alone[,names(followup_alone) == name_fill] <- followup_label
-  }
-
-  # append to dataset:
-  # df <- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+  # 
+  # # getting intersection of the original data and the inverted intervals to find
+  # # the instances of follow-up with no associated filled interval:
+  # followup_alone <- getIntersection(
+  #   dt1=df, dt2=inverted_dat, id=id, Tx=name_fill, start=start, end=end)
+  # 
+  # if (nrow(followup_alone) > 0) {
+  #   followup_alone[,names(followup_alone) == name_fill] <- followup_label
+  # }
+  # 
+  # # append to dataset:
+  # followup_alone$xmin <- as.numeric(followup_alone[,id]) - width/2
+  # followup_alone$xmax <- as.numeric(followup_alone[,id]) + width/2
+  # 
+  # df <- bind_rows(df, followup_alone)
   
   # ~~~~~~~~~~~~ #
   
@@ -316,13 +319,13 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
   }
   
   plot <-
-    ggplot2::ggplot() +
-    ggplot2::geom_rect(data=total_followup, mapping=ggplot2::aes(
-      xmin = xmin, xmax = xmax, ymin = min_start, ymax = max_end),
+    ggplot2::ggplot(data=df, mapping=ggplot2::aes_string(x=id)) +
+    ggplot2::geom_rect(data=total_followup, mapping=ggplot2::aes_string(
+      xmin = "xmin", xmax = "xmax", ymin = start, ymax = end),
       fill=starting_bar_fill, col=starting_bar_col, alpha=starting_bar_alpha) +
     ggplot2::geom_rect(data=df, mapping= 
       ggplot2::aes_string(fill = name_fill, col = name_col, alpha=name_alpha, 
-                          xmin = "xmin", xmax = "xmax", ymin=start, ymax = end),...) +  
+                          xmin = "xmin", xmax = "xmax", ymin=start, ymax = end)) +  
     ggplot2::scale_x_discrete(labels=id_order) +
     ggplot2::coord_flip() +
     ggplot2::theme_bw(base_size = base_size) +
@@ -415,7 +418,8 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
 #' @export
 swimmer_points <-function(df_points,id='id',time='time',adj.y=0,name_shape=NULL,name_col=NULL,name_size=NULL,name_fill=NULL,name_stroke=NULL,name_alpha=NULL,...)
 {
-
+  
+  df_points <- data.frame(df_points)
   df_points[,id] <- as.character(df_points[,id])
 
 
