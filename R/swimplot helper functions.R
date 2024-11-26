@@ -12,6 +12,7 @@ getIntersection <- function(dt1, dt2=NULL, id, Tx, start, end){
   # if a second dataset is not passed in, use dt1 twice in the merge step.
   if (is.null(dt2)) {
     same_dataset <- TRUE
+    dt1[,"Index"] <- 1:nrow(dt1)
     dt2 <- dt1
   } else same_dataset <- FALSE
   
@@ -29,7 +30,7 @@ getIntersection <- function(dt1, dt2=NULL, id, Tx, start, end){
   # if we merged dt1 with itself, need to get rid of instances where a single
   # treatment is overlapping with itself:
   if (same_dataset){
-    tmp <- tmp |> dplyr::filter(!!dplyr::sym(Txxy[1]) != !!dplyr::sym(Txxy[2]))
+    tmp <- tmp |> dplyr::filter(Index_1 != Index_2) |> dplyr::select(-c(Index_1, Index_2))
   }
   
   # fix names (we'll need to keep the names consistent for the merge to work
