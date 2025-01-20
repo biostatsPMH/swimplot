@@ -219,7 +219,7 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
     }
 
     ##Checking there are not overlapping sections
-    overlap <- getIntersection(df, id=id, start=start, end=end, Tx=name_fill)
+    overlap <- getIntersection(df, id=id, start=start, end=end, Tx=name_fill, retain_vars=stratify)
     if(nrow(overlap)>0) {
       warning(paste0(paste0("There is(are) ", length(unique(overlap[,id]))," id(s) with overlap between bars, they are ",id,"=(",paste (overlap[,id],sep="", collapse=","),")")))
       if (!is.null(name_col) | !is.null(name_alpha)) {
@@ -227,7 +227,7 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
         name_alpha <- NULL
         name_col <- NULL
       }
-      df <- transform_for_swimplot(df, id=id, start=start, end=end, Tx=name_fill)
+      df <- transform_for_swimplot(df, id=id, start=start, end=end, Tx=name_fill, retain_vars=stratify)
     }
     
   } else {
@@ -254,16 +254,58 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
   # df[, id] <- factor(df[, id], levels = id_order)
   
   # using ggplot2::geom_rect to create the bars. Need to specify xmin and xmax:
-  df[,id] <- factor(df[,id], levels=id_order)
-  df$xmin <- as.numeric(df[,id]) - width/2
-  df$xmax <- as.numeric(df[,id]) + width/2
-  
+  if (is.null(stratify)){
+    df[,id] <- factor(df[,id], levels=id_order)
+    df$xmin <- as.numeric(df[,id]) - width/2
+    df$xmax <- as.numeric(df[,id]) + width/2
+  } else {
+    strata_tmp <- unique(data.frame(df[,stratify,drop=F]))
+    id_order_bystrata <- NULL
+    
+    # for each strata, we need to pull out the IDs, and give them an order. 
+    for (i in 1:nrow(strata_tmp)){
+      strata_i <- unlist(strata_tmp[i,,drop=F])
+      
+      # want only the IDs in a given stratum:
+      tmp_ids_in_strata <- rep(TRUE, nrow(df))
+      for (j in 1:length(stratify)){
+        tmp_ids_in_strata <- tmp_ids_in_strata & df[,names(strata_i)[j]] == strata_i[j]
+      }
+      
+      tmp_stratum <- df[tmp_ids_in_strata,,drop=F]
+      
+      # order just the ids in that stratum:
+      id_order_stratum_tmp <- id_order[id_order %in% tmp_stratum[,id]]
+      id_order_stratum_tmp <- factor(id_order_stratum_tmp, levels=c(id_order_stratum_tmp))
+      
+      # set xmin and xmax:
+      id_order_bystrata <- rbind(id_order_bystrata, data.frame(
+        id_order_stratum_tmp, 
+        xmin = as.numeric(id_order_stratum_tmp) - width/2,
+        xmax = as.numeric(id_order_stratum_tmp) + width/2))
+    }
+    # Then we stick it all back together. 
+    names(id_order_bystrata)[names(id_order_bystrata) == "id_order_stratum_tmp"] <- id
+    id_order_bystrata[,id] <- as.character(id_order_bystrata[,id])
+    
+    df <- dplyr::left_join(df, id_order_bystrata, by=id)
+    df[,id] <- factor(df[,id], levels=id_order)
+  }
+
   # Add rectangles underneath to indicate total length of follow-up?
-  total_followup <- 
-    dplyr::summarize(dplyr::group_by(df, !!dplyr::sym(id), xmin, xmax), 
-                     min_start = min(!!dplyr::sym(start), na.rm=T),
-                     max_end = max(!!dplyr::sym(end), na.rm=T), .groups="keep",
-                     Tx = "X_total_followup_time_X")
+  if (!is.null(stratify)){
+    total_followup <- 
+      dplyr::summarize(dplyr::group_by(df, !!dplyr::sym(id), !!dplyr::sym(stratify), xmin, xmax), 
+                       min_start = min(!!dplyr::sym(start), na.rm=T),
+                       max_end = max(!!dplyr::sym(end), na.rm=T), .groups="keep",
+                       Tx = "X_total_followup_time_X")
+  } else {
+    total_followup <- 
+      dplyr::summarize(dplyr::group_by(df, !!dplyr::sym(id), xmin, xmax), 
+                       min_start = min(!!dplyr::sym(start), na.rm=T),
+                       max_end = max(!!dplyr::sym(end), na.rm=T), .groups="keep",
+                       Tx = "X_total_followup_time_X")
+  }
   
   names(total_followup)[names(total_followup) == "min_start"] <- start
   names(total_followup)[names(total_followup) == "max_end"] <- end
@@ -273,13 +315,13 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
   
   # ~~~~~~~~~~~~ #
   
-  # Take intersection of rows and total follow-up time:
-  intersect_dat <- getIntersection(
-    dt1=total_followup, dt2=df, id=id, Tx=name_fill, start=start, end=end)
-  
-  # Getting inverted intervals (complement of the set of overlapping intervals):
-  inverted_dat <- invertedIntervals(
-    intersection=intersect_dat, dt=df, id=id, start=start, end=end)
+  # # Take intersection of rows and total follow-up time:
+  # intersect_dat <- getIntersection(
+  #   dt1=total_followup, dt2=df, id=id, Tx=name_fill, start=start, end=end, retain_vars=c(stratify,"xmin","xmax"))
+  # 
+  # # Getting inverted intervals (complement of the set of overlapping intervals):
+  # inverted_dat <- invertedIntervals(
+  #   intersection=intersect_dat, dt=df, id=id, start=start, end=end)
   # 
   # # getting intersection of the original data and the inverted intervals to find
   # # the instances of follow-up with no associated filled interval:
@@ -307,8 +349,8 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
       cols=all_of(fill_names_tmp), names_to="Xoverlap_name_fillX", 
       values_to=name_fill, values_drop_na=T))
     xminmax_modifier <- (as.numeric(factor(overlap$Xoverlap_name_fillX)) - 1.5)*width/2
-    overlap$xmin <- as.numeric(overlap[,id]) - width/4 + xminmax_modifier
-    overlap$xmax <- as.numeric(overlap[,id]) + width/4 + xminmax_modifier
+    overlap$xmin <- overlap$xmin + width/4 + xminmax_modifier
+    overlap$xmax <- overlap$xmax - width/4 + xminmax_modifier
     overlap <- overlap[,!names(overlap) %in% "Xoverlap_name_fillX", drop=F]
     
     nonoverlap <- df[is.na(df[,fill_names_tmp[2]]),
@@ -319,8 +361,15 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
   }
   
   plot <-
-    ggplot2::ggplot(data=df, mapping=ggplot2::aes_string(x=id)) +
-    ggplot2::geom_rect(data=total_followup, mapping=ggplot2::aes_string(
+    ggplot2::ggplot(data=df, mapping=ggplot2::aes_string(x=id)) 
+  
+  if(!is.null(stratify)) {
+    plot <-  plot + 
+      ggplot2::facet_wrap(stats::as.formula(paste("~",paste(stratify,collapse = "+"))), ncol=1, scales="free") +
+      ggplot2::theme(strip.background = ggplot2::element_rect(colour="black", fill="white"))
+  }
+  
+  plot <- plot + ggplot2::geom_rect(data=total_followup, mapping=ggplot2::aes_string(
       xmin = "xmin", xmax = "xmax", ymin = start, ymax = end),
       fill=starting_bar_fill, col=starting_bar_col, alpha=starting_bar_alpha) +
     ggplot2::geom_rect(data=df, mapping= 
@@ -331,13 +380,6 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
     ggplot2::theme_bw(base_size = base_size) +
     ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
                    panel.grid.major = ggplot2::element_blank()) 
-
-
-  if(!is.null(stratify)) {
-    plot <-  plot + 
-      ggplot2::facet_wrap(stats::as.formula(paste("~",paste(stratify,collapse = "+"))),scales = "free_y")+
-      ggplot2::theme(strip.background = ggplot2::element_rect(colour="black", fill="white"))
-  }
 
 
   if(identifiers==FALSE) plot <-  plot + ggplot2::theme(axis.title.y=ggplot2::element_blank(),
@@ -422,7 +464,6 @@ swimmer_points <-function(df_points,id='id',time='time',adj.y=0,name_shape=NULL,
   df_points <- data.frame(df_points)
   df_points[,id] <- as.character(df_points[,id])
 
-
   plot.pt <-
     ggplot2::geom_point(
       data = df_points,
@@ -433,7 +474,8 @@ swimmer_points <-function(df_points,id='id',time='time',adj.y=0,name_shape=NULL,
         size = name_size,
         fill=name_fill,
         stroke=name_stroke,
-        alpha=name_alpha),position = ggplot2::position_nudge(x = adj.y, y = 0),...)
+        alpha=name_alpha),
+      position = ggplot2::position_nudge(x = adj.y, y = 0),...)
 
   return(plot.pt)
 }

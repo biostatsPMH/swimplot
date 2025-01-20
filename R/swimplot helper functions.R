@@ -3,18 +3,28 @@
 # Katrina Hueniken, first added to swimplot October 2024        # 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
-# getIntersection() finds all occurrences of overlapping treatments. 
+# getIntersection() finds all occurrences of overlapping treatments.
+# note that treatment must be present in dataset 1.
 
-getIntersection <- function(dt1, dt2=NULL, id, Tx, start, end){
+getIntersection <- function(dt1, dt2=NULL, id, Tx, start, end, retain_vars=NULL){
+  if (is.null(start) | is.null(end) | is.null(Tx) | is.null(id)) stop("ID, Start/end times, and treatment variable must be specified")
+  if (!all(c(id,Tx,start,end) %in% names(dt1))) stop("Specified variable is not found in dataset 1")
+  if (!is.null(dt2) & !all(c(id,start,end) %in% names(dt2))) stop("Specified variable is not found in dataset 2")
+  if (!all(retain_vars %in% c(names(dt1), names(dt2)))) stop("Retained variables not found in either dataset.")
+  
   # sort by id, start date, end date:
   dt1 <- dt1 |> dplyr::arrange(!!dplyr::sym(id), !!dplyr::sym(start), !!dplyr::sym(end))
+  dt1 <- dt1[,names(dt1) %in% c(id, Tx, start, end, retain_vars)]
   
   # if a second dataset is not passed in, use dt1 twice in the merge step.
   if (is.null(dt2)) {
     same_dataset <- TRUE
     dt1[,"Index"] <- 1:nrow(dt1)
     dt2 <- dt1
-  } else same_dataset <- FALSE
+  } else {
+    same_dataset <- FALSE
+    dt2 <- dt2[,names(dt2) %in% c(id, Tx, start, end, retain_vars)]
+  }
   
   startxy <- paste0(start, c("_1","_2"))
   endxy <- paste0(end, c("_1","_2"))
@@ -53,11 +63,26 @@ getIntersection <- function(dt1, dt2=NULL, id, Tx, start, end){
                   overlap_end = pmin(!!dplyr::sym(endxy[1]), !!dplyr::sym(endxy[2]))) |>
     dplyr::filter(row_no_1 != row_no_2 & overlap_start < overlap_end)
   
-  if (nrow(check_morethantwo) > 0) stop(
+  if (nrow(check_morethantwo) > 0) stop(paste0(
     "Dataset has three or more treatments overlapping in time. 
-    More than two overlapping treatments is not currently supported by swimplot.")
+    More than two overlapping treatments is not currently supported by swimplot. IDs: ", 
+    paste(collapse=", ", unique(check_morethantwo[,id]))))
   
-  return(tmp[,names(tmp) %in% c(id, start, end, Tx, Txxy)])
+  # retain variables for stratification. 
+  if (!is.null(retain_vars)){
+    for (i in 1:length(retain_vars)){
+      
+      if (!paste0(retain_vars[i],"_2") %in% names(tmp)) next
+      if (!identical(tmp[,paste0(retain_vars[i],"_1")], tmp[,paste0(retain_vars[i],"_2")])) {
+        stop("Error in merging stratification variables in getIntersection()")
+      }
+      
+      which_rename_tmp <- which(names(tmp) == paste0(retain_vars[i],"_1"))
+      if (length(which_rename_tmp) > 0) names(tmp)[which_rename_tmp] <- retain_vars[i]
+    }
+  }
+  
+  return(tmp[,names(tmp) %in% c(id, start, end, Tx, Txxy, retain_vars)]) 
 }
 
 # invertedIntervals() takes the original treatment data and the output from
@@ -115,9 +140,9 @@ invertedIntervals <- function(dt, intersection, id, start, end){
 # treatments by finding overlap between two treatments at a time, and looping
 # through all possible treatments.
 
-transform_for_swimplot <- function (df, id, Tx, start, end){
+transform_for_swimplot <- function (df, id, Tx, start, end, retain_vars=NULL){
   # Find overlapping intervals for each patient:
-  intersect_dat <- getIntersection(dt1=df, id=id, Tx=Tx, start=start, end=end)
+  intersect_dat <- getIntersection(dt1=df, id=id, Tx=Tx, start=start, end=end, retain_vars=retain_vars)
   
   # Getting inverted intervals (complement of the set of overlapping intervals):
   inverted_dat <- invertedIntervals(intersection=intersect_dat, dt=df, id=id, start=start, end=end)
@@ -125,7 +150,7 @@ transform_for_swimplot <- function (df, id, Tx, start, end){
   # recycling getIntersection function above, but this time passing in both the
   # original data and the inverted intervals:
   non_intersect_dat <- getIntersection(
-    dt1=df, dt2=inverted_dat, id=id, Tx=Tx, start=start, end=end)
+    dt1=df, dt2=inverted_dat, id=id, Tx=Tx, start=start, end=end, retain_vars=retain_vars)
   names(non_intersect_dat)[names(non_intersect_dat) == Tx] <- paste0(Tx, "_1")
   
   # Putting intersection and non-intersection together:
