@@ -298,7 +298,7 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
     # Label each row with the same ID so we can pivot:
     df_tmp_wide <-   
       dplyr::group_by(df[,c(id, "xmin", "xmax", stratify, start, end)], !!dplyr::sym(id)) 
-    df_tmp_wide <- dplyr::mutate(df_tmp_wide, index=1:n())  
+    df_tmp_wide <- dplyr::mutate(df_tmp_wide, index=1:(dplyr::n()))  
     
     # Pull out min start:
     df_start_wide <- tidyr::pivot_wider(
