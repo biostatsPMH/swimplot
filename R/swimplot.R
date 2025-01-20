@@ -294,11 +294,31 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
 
   # Add rectangles underneath to indicate total length of follow-up?
   if (!is.null(stratify)){
-    total_followup <- 
-      dplyr::summarize(dplyr::group_by(df, !!dplyr::sym(id), !!dplyr::sym(stratify), xmin, xmax), 
-                       min_start = min(!!dplyr::sym(start), na.rm=T),
-                       max_end = max(!!dplyr::sym(end), na.rm=T), .groups="keep",
-                       Tx = "X_total_followup_time_X")
+    
+    # Label each row with the same ID so we can pivot:
+    df_tmp_wide <-   
+      dplyr::group_by(df[,c(id, "xmin", "xmax", stratify, start, end)], !!dplyr::sym(id)) 
+    df_tmp_wide <- dplyr::mutate(df_tmp_wide, index=1:n())  
+    
+    # Pull out min start:
+    df_start_wide <- tidyr::pivot_wider(
+      df_tmp_wide[,!names(df_tmp_wide) %in% end], 
+      names_from=index, values_from=start, names_prefix = "xxx_pivotedstart_xxx")
+    which_start_tmp <- grep("xxx_pivotedstart_xxx",names(df_start_wide))
+    df_start_wide$min_start <- apply(df_start_wide[,which_start_tmp], 1, min, na.rm=T)
+    
+    # Pull out max end:
+    df_end_wide <- tidyr::pivot_wider(
+      df_tmp_wide[,!names(df_tmp_wide) %in% start], 
+      names_from=index, values_from=end, names_prefix = "xxx_pivotedend_xxx")
+    which_end_tmp <- grep("xxx_pivotedend_xxx",names(df_end_wide))
+    df_end_wide$max_end <- apply(df_end_wide[,which_end_tmp], 1, max, na.rm=T)
+    
+    # Summarize min and max follow-up time:
+    total_followup <- dplyr::inner_join(df_start_wide[,c(id, "xmin", "xmax", "min_start", stratify)],
+                                df_end_wide[,c(id, "xmin", "xmax", "max_end", stratify)]) 
+    total_followup$Tx <- "X_total_followup_time_X"
+                       
   } else {
     total_followup <- 
       dplyr::summarize(dplyr::group_by(df, !!dplyr::sym(id), xmin, xmax), 
