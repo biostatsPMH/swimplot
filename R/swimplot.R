@@ -21,6 +21,7 @@
 #' @param starting_bar_col outline colour for bar indicating the total length of follow-up (default is grey90)
 #' @param starting_bar_alpha transparency for bar indicating the total length of follow-up (default is opaque)
 #' @param stratify a list of column names to stratify by
+#' @param ncol If stratifying, can specify number of columns (otherwise will not be called). 
 #' @param base_size the base size for the plot, default is 11
 #' @param identifiers Binary to specify patient identifiers are included in the y axis (default is TRUE)
 #' @param ... additional arguments passed to geom_rect() 
@@ -84,7 +85,7 @@
 #' @export
 swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
                          name_col=NULL,name_alpha=NULL,width=0.9,
-                         increasing=TRUE,id_order = NULL,
+                         increasing=TRUE,id_order = NULL,ncol=1,
                          starting_bar_label="Follow-up",starting_bar_fill="grey90", 
                          starting_bar_col="grey90", starting_bar_alpha=1, 
                          stratify=NULL,base_size=11,identifiers=TRUE,...)
@@ -380,28 +381,32 @@ swimmer_plot <- function(df,id='id',end='end',start='start',name_fill=NULL,
     df <- dplyr::bind_rows(overlap, nonoverlap)
   }
   
+  # df <- df[df$record_id %in% c("103-0104","115-0034"),]
+  # total_followup <- total_followup[total_followup$record_id %in% c("103-0104","115-0034"),]
+  
   plot <-
     ggplot2::ggplot(data=df, mapping=ggplot2::aes_string(x=id)) 
   
-  if(!is.null(stratify)) {
-    plot <-  plot + 
-      ggplot2::facet_wrap(stats::as.formula(paste("~",paste(stratify,collapse = "+"))), ncol=1, scales="free") +
-      ggplot2::theme(strip.background = ggplot2::element_rect(colour="black", fill="white"))
-  }
-  
-  plot <- plot + ggplot2::geom_rect(data=total_followup, mapping=ggplot2::aes_string(
+  plot <- plot + 
+    ggplot2::geom_rect(data=total_followup, mapping=ggplot2::aes_string(
       xmin = "xmin", xmax = "xmax", ymin = start, ymax = end),
       fill=starting_bar_fill, col=starting_bar_col, alpha=starting_bar_alpha) +
-    ggplot2::geom_rect(data=df, mapping= 
-      ggplot2::aes_string(fill = name_fill, col = name_col, alpha=name_alpha, 
-                          xmin = "xmin", xmax = "xmax", ymin=start, ymax = end)) +  
-    ggplot2::scale_x_discrete(labels=id_order) +
+    ggplot2::geom_rect(data=df, mapping=
+      ggplot2::aes_string(fill = name_fill, col = name_col, alpha=name_alpha,
+                          xmin = "xmin", xmax = "xmax", ymin=start, ymax = end)) +
     ggplot2::coord_flip() +
     ggplot2::theme_bw(base_size = base_size) +
     ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
                    panel.grid.major = ggplot2::element_blank()) 
 
-
+  if(!is.null(stratify)) {
+    plot <-  plot + 
+      ggplot2::facet_wrap(stats::as.formula(paste(".~",paste(stratify,collapse = "+"))),
+                          ncol=ncol, scales="free_y") +
+      ggplot2::theme(strip.background = ggplot2::element_rect(colour="black", fill="white"))
+  }
+  
+  
   if(identifiers==FALSE) plot <-  plot + ggplot2::theme(axis.title.y=ggplot2::element_blank(),
                                                         axis.text.y=ggplot2::element_blank(),
                                                         axis.ticks.y=ggplot2::element_blank())

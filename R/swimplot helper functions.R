@@ -104,6 +104,10 @@ invertedIntervals <- function(dt, intersection, id, start, end){
   tmp_first[,start] <- -Inf
   
   # get all inverted intervals after the first one:
+  if (class(intersection[,start]) == "Date" | class(intersection[,end]) == "Date"){
+    stop("Swimplot helper functions do not currently support start and end times formatted as dates. Please input start and end times formatted as double or integer.")
+  }
+  
   first_id <- intersection[1,id]
   tmp_subsequent <- intersection[,c(id, start, end)] |> 
     tidyr::pivot_longer(2:3, values_to="date") |> 
