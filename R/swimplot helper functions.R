@@ -72,9 +72,10 @@ getIntersection <- function(dt1, dt2=NULL, id, Tx, start, end, retain_vars=NULL)
   if (!is.null(retain_vars)){
     for (i in 1:length(retain_vars)){
       
+      
       if (!paste0(retain_vars[i],"_2") %in% names(tmp)) next
       if (!identical(tmp[,paste0(retain_vars[i],"_1")], tmp[,paste0(retain_vars[i],"_2")])) {
-        stop("Error in merging stratification variables in getIntersection()")
+        stop("Error in merging stratification variables in getIntersection(). Check that all observations from a given patient belong to the same stratum.")
       }
       
       which_rename_tmp <- which(names(tmp) == paste0(retain_vars[i],"_1"))
